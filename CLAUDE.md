@@ -8,7 +8,7 @@ The back end for Stratego Barrage, in .NET 10 on Azure: an ASP.NET Core API, plu
 
 ## Rules
 
-- **Never run `git add` or `git commit`, and never create a branch** unless the user says to. The user reviews and commits every change, so leave changes in the working tree.
+- **Never run `git add`, `git commit` or `git push`, and never create or switch branches, on your own.** The user works alongside you and handles git. When something needs one of these, say so and wait: the user does it, says no, or tells you to do it. Each phase is done on its own branch.
 - **Settle choices in chat before they go in the docs.** When a decision is open, lay out the options with their costs and a recommendation, and write it into the docs only once the user decides. If you fill a gap yourself, say so in chat so the user can veto it.
 - **Check prices and limits before quoting them.** Use Microsoft Learn and the Azure Retail Prices API (`https://prices.azure.com/api/retail/prices`, filtered to `armRegionName eq 'centralus'`). The Azure pricing pages load their prices with script, so they can't be read.
 

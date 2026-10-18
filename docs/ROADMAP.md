@@ -11,10 +11,10 @@ The solution builds and tests in CI, both environments exist, and every merge an
 
 ### GitHub
 
-- [ ] **You:** Allow only squash merges, and delete branches automatically after merging.
-- [ ] **You:** Protect `main` with a ruleset: changes only through pull requests, linear history, and no force pushes or deletion.
-- [ ] **You:** Protect release tags with a ruleset: `v*` tags can't be moved or deleted.
-- [ ] **You:** Create the `test` and `production` environments. `production` only accepts `v*` tags, and waits for your approval before each deployment.
+- [x] **You:** Allow only squash merges, and delete branches automatically after merging.
+- [x] **You:** Protect `main` with a ruleset: changes only through pull requests, linear history, and no force pushes or deletion.
+- [x] **You:** Protect release tags with a ruleset: `v*` tags can't be moved or deleted.
+- [ ] **You:** Create the `test` and `production` environments. `test` only accepts `main`; `production` only accepts `v*` tags, and waits for your approval before each deployment.
 
 ### Azure
 
