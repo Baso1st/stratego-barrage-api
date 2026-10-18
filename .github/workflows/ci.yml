@@ -1,0 +1,25 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Compile and lint the Bicep
+        env:
+          ALERT_EMAIL: ci@example.com
+        run: |
+          az bicep build --file infra/bootstrap/main.bicep --stdout > /dev/null
+          az bicep lint --file infra/bootstrap/main.bicep
+          az bicep build --file infra/main.bicep --stdout > /dev/null
+          az bicep lint --file infra/main.bicep
+          az bicep build-params --file infra/test.bicepparam --stdout > /dev/null
+          az bicep build-params --file infra/prod.bicepparam --stdout > /dev/null

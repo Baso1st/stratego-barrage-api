@@ -1,0 +1,36 @@
+name: Deploy to test
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write
+
+# One deployment at a time; a newer merge waits for the one before it to finish.
+concurrency:
+  group: deploy-test
+  cancel-in-progress: false
+
+jobs:
+  infrastructure:
+    runs-on: ubuntu-latest
+    environment: test
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Sign in to Azure
+        uses: azure/login@v3
+        with:
+          client-id: ${{ vars.AZURE_CLIENT_ID }}
+          tenant-id: ${{ vars.AZURE_TENANT_ID }}
+          subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Apply the infrastructure
+        run: >
+          az deployment group create
+          --resource-group rg-stratego-api-test
+          --name infra-${{ github.run_number }}
+          --parameters infra/test.bicepparam

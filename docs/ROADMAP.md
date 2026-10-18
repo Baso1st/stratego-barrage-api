@@ -9,46 +9,54 @@ The plan from an empty repository to the API running in production, phase by pha
 
 The solution builds and tests in CI, both environments exist, and every merge and release deploys itself. The apps run on test and production, doing nothing yet but answering health checks.
 
+It lands in two PRs: first the infrastructure and the pipeline that deploys it, so test exists and the deployment path is proven before there's any code; then the solution, and the pipeline steps that build and deploy it.
+
 ### GitHub
 
-- [ ] **You:** Allow only squash merges, and delete branches automatically after merging.
-- [ ] **You:** Protect `main` with a ruleset: changes only through pull requests, linear history, and no force pushes or deletion.
-- [ ] **You:** Protect release tags with a ruleset: `v*` tags can't be moved or deleted.
-- [ ] **You:** Create the `test` and `production` environments. `production` only accepts `v*` tags, and waits for your approval before each deployment.
+- [x] **You:** Allow only squash merges, and delete branches automatically after merging.
+- [x] **You:** Protect `main` with a ruleset: changes only through pull requests, linear history, and no force pushes or deletion.
+- [x] **You:** Protect release tags with a ruleset: `v*` tags can't be moved or deleted.
+- [x] **You:** Create the `test` and `production` environments. `test` only accepts `main`; `production` only accepts `v*` tags, and waits for your approval before each deployment.
 
 ### Azure
 
-- [ ] Bootstrap script in `infra/bootstrap/`: a resource group per environment, and an identity per environment that GitHub Actions signs in as with OIDC, trusted only from its own GitHub environment and given roles only on its own resource group.
-- [ ] **You:** Run the bootstrap once, signed in as an owner of the subscription.
-- [ ] **You:** Add what the bootstrap prints to GitHub as variables: the tenant and subscription IDs for the repository, each identity's client ID for its environment, and the email address that alerts go to.
+- [x] Bootstrap script in `infra/bootstrap/`: a resource group per environment, and an identity per environment that GitHub Actions signs in as with OIDC, trusted only from its own GitHub environment and given roles only on its own resource group.
+- [x] **You:** Run the bootstrap once, signed in as an owner of the subscription.
+- [x] **You:** Add what the bootstrap prints to GitHub as variables: the tenant and subscription IDs for the repository, each identity's client ID for its environment, and the email address that alerts go to.
 
 ### Infrastructure
 
 `infra/main.bicep`, with a parameter file per environment:
 
-- [ ] App Service Plan: B1 on test, P0v3 on production.
-- [ ] API Web App with WebSockets, Always On and its health check, plus a staging slot on production.
-- [ ] Worker and bot Function Apps on the same plan, with Always On, and their storage account.
-- [ ] Cosmos DB: serverless on test; free tier with 1,000 RU/s on the database on production. The four containers, with their partition keys, and `state` and `data` left out of the index.
-- [ ] Service Bus, Basic tier, with the `bot-turns` and `game-timers` queues.
-- [ ] Key Vault, and Application Insights with sampling and a daily cap.
-- [ ] A managed identity for each app, with Azure RBAC roles on Cosmos DB, Service Bus, Storage and Key Vault, and no keys or connection strings.
-- [ ] Alerts by email: the availability target's error budget, and 80% of capacity (Cosmos DB's normalized RU consumption, and the plan's CPU and memory).
+- [x] App Service Plan: B1 on test, P0v3 on production.
+- [x] API Web App with WebSockets, Always On and its health check, plus a staging slot on production.
+- [x] Worker and bot Function Apps on the same plan, with Always On, and their storage account.
+- [x] Cosmos DB: serverless on test; free tier with 1,000 RU/s on the database on production. The four containers, with their partition keys, and `state` and `data` left out of the index.
+- [x] Service Bus, Basic tier, with the `bot-turns` and `game-timers` queues.
+- [x] Key Vault, and Application Insights with a daily cap.
+- [x] A managed identity for each app, with Azure RBAC roles on Cosmos DB, Service Bus, Storage and Key Vault, and no keys or connection strings.
+- [x] Alerts by email: the availability target's error budget, and 80% of capacity (Cosmos DB's normalized RU consumption, and the plan's CPU and memory).
+
+### Pipeline for the infrastructure
+
+- [ ] CI on every PR, as one `build` check: compile and lint the Bicep.
+- [ ] Deploy to test on every merge to `main`: sign in to Azure with OIDC, and apply the Bicep.
+- [ ] **You:** Make CI a required check in the `main` ruleset, with the branch up to date before merging. GitHub only offers a check once it has run.
+- [ ] **You:** Squash-merge the first PR. Its deployment creates test's resources.
 
 ### Solution
 
 - [ ] The .NET 10 solution: the API, the worker, the bot, the games module, the Aspire app host, shared service defaults, and the test projects.
 - [ ] Formatting rules in `.editorconfig`, shared build settings, and central package versions.
-- [ ] Service defaults for all three apps: OpenTelemetry to Application Insights, and health checks.
+- [ ] Service defaults for all three apps: OpenTelemetry to Application Insights, with sampling, and health checks.
 - [ ] The API: its health endpoint, Problem Details for errors, and the OpenAPI document generated at build time.
 - [ ] The worker and the bot: Function Apps (isolated worker model) that start and send telemetry.
 - [ ] The Aspire app host: the three apps, with the Cosmos DB and Service Bus emulators.
 
-### CI/CD
+### Pipeline for the apps
 
-- [ ] CI on every PR: build, format check, tests, and the OpenAPI breaking-change check against the last release.
-- [ ] **You:** Make CI a required check in the `main` ruleset, with the branch up to date before merging. GitHub only offers a check once it has run.
-- [ ] Deploy to test on every merge to `main`: publish the three apps, apply the Bicep, deploy, and check the API's health endpoint.
+- [ ] CI also builds the solution, checks formatting, runs the tests, and checks the OpenAPI document for breaking changes against the last release.
+- [ ] Deploy to test also publishes the three apps, deploys them, and checks the API's health endpoint.
 - [ ] Release to production on a published `v*` release: check the tag is on `main`, rebuild that commit, apply the Bicep, deploy the API to the staging slot, warm it up and swap it in, and deploy the Function Apps in place.
 
 ### Tests
