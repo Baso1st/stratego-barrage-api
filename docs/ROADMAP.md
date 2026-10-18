@@ -58,6 +58,7 @@ It lands in two PRs: first the infrastructure and the pipeline that deploys it, 
 - [ ] CI also builds the solution, checks formatting, runs the tests, and checks the OpenAPI document for breaking changes against the last release.
 - [ ] Deploy to test also publishes the three apps, deploys them, and checks the API's health endpoint.
 - [ ] Release to production on a published `v*` release: check the tag is on `main`, rebuild that commit, apply the Bicep, deploy the API to the staging slot, warm it up and swap it in, and deploy the Function Apps in place.
+- [ ] Dependabot (`.github/dependabot.yml`): weekly PRs for NuGet packages and GitHub Actions, only for releases at least 2 weeks old.
 
 ### Tests
 
