@@ -23,6 +23,7 @@ The back end for **Stratego Barrage**, the fast, small-army variant of the Strat
 | --- | --- |
 | [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | How the API is built: hosting, data model, endpoints, delivery, cost and capacity |
 | [docs/RULES.md](docs/RULES.md) | The rules of Barrage as the API enforces them |
+| [docs/ROADMAP.md](docs/ROADMAP.md) | The plan, phase by phase, and how far along it is |
 
 ## Local development
 

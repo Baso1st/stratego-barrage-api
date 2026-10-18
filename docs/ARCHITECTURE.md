@@ -336,19 +336,19 @@ How they're used:
 
 ## 5. API
 
-| Method | Path | What it does | Phase |
-| --- | --- | --- | --- |
-| `GET` | `/v1/me` | Your profile and stats; registers you on first sign-in | 2 |
-| `GET` | `/v1/me/games` | Your finished games: opponent, result, length (paged) | 3 |
-| `POST` | `/v1/games` | Start a game against the computer: `{ "mode": "vs-bot" }` | 3 |
-| `GET` | `/v1/games/{id}` | Your view: the board as you see it, your legal moves, the version, the turn deadline and the server's time | 3 |
-| `GET` | `/v1/games/{id}/events?after={version}` | What happened since a version, as you're allowed to see it | 3 |
-| `PUT` | `/v1/games/{id}/setup` | Place your 8 pieces | 3 |
-| `POST` | `/v1/games/{id}/moves` | Play a move: `{ from, to, expectedVersion }` | 3 |
-| `POST` | `/v1/games/{id}/resign` | Resign | 3 |
-| `POST` | `/v1/games` | Start a game against a friend: `{ "mode": "vs-person" }`, which returns the invite link | 4 |
-| `POST` | `/v1/games/{id}/join` | Join a friend's game: `{ "code": "…" }` | 4 |
-| `DELETE` | `/v1/games/{id}` | Cancel your game while it's waiting for your friend | 4 |
+| Method | Path | What it does |
+| --- | --- | --- |
+| `GET` | `/v1/me` | Your profile and stats; registers you on first sign-in |
+| `GET` | `/v1/me/games` | Your finished games: opponent, result, length (paged) |
+| `POST` | `/v1/games` | Start a game against the computer: `{ "mode": "vs-bot" }` |
+| `GET` | `/v1/games/{id}` | Your view: the board as you see it, your legal moves, the version, the turn deadline and the server's time |
+| `GET` | `/v1/games/{id}/events?after={version}` | What happened since a version, as you're allowed to see it |
+| `PUT` | `/v1/games/{id}/setup` | Place your 8 pieces |
+| `POST` | `/v1/games/{id}/moves` | Play a move: `{ from, to, expectedVersion }` |
+| `POST` | `/v1/games/{id}/resign` | Resign |
+| `POST` | `/v1/games` | Start a game against a friend: `{ "mode": "vs-person" }`, which returns the invite link |
+| `POST` | `/v1/games/{id}/join` | Join a friend's game: `{ "code": "…" }` |
+| `DELETE` | `/v1/games/{id}` | Cancel your game while it's waiting for your friend |
 
 **Responses:** `401` without a valid token, `403` for a game you're not in, `409` when `expectedVersion` is stale (with the current view) or an invite has been used, `422` for a move the rules don't allow (Problem Details saying why).
 
@@ -455,15 +455,6 @@ The targets the API is held to. Every change has to keep them.
   - **The bot's thinking time.** A test plays the bot on the hardest positions in its tests, and fails if any move takes longer than 250 ms.
 - **A release that breaks a target is rolled back** (section 3.6).
 
-## 9. Phases
-
-Each phase ships something usable.
-
-1. **Foundations:** the .NET solution, Aspire, CI, infrastructure for test and production, health endpoints, deploys on merge and release, and the service-level alerts.
-2. **Registration and profiles:** Google sign-in through Entra External ID, and `/v1/me`.
-3. **Games against the computer, on the server:** the engine and the computer opponent, the games API, SignalR, the worker and the bot, the 10-minute limit, leaving and resigning, stats and finished games, and the CI budgets for request units and the bot's thinking time.
-4. **Games against a friend:** invite links and sides drawn at random.
-
-## 10. Open questions
+## 9. Open questions
 
 None right now.

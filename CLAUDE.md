@@ -12,9 +12,19 @@ The back end for Stratego Barrage, in .NET 10 on Azure: an ASP.NET Core API, plu
 - **Settle choices in chat before they go in the docs.** When a decision is open, lay out the options with their costs and a recommendation, and write it into the docs only once the user decides. If you fill a gap yourself, say so in chat so the user can veto it.
 - **Check prices and limits before quoting them.** Use Microsoft Learn and the Azure Retail Prices API (`https://prices.azure.com/api/retail/prices`, filtered to `armRegionName eq 'centralus'`). The Azure pricing pages load their prices with script, so they can't be read.
 
+## Roadmap
+
+`docs/ROADMAP.md` is the plan from an empty repository to production, and the only place progress is tracked. It's imported below so it loads at the start of every session.
+
+- Work through it in order, one item at a time, and check it before starting new work to see where things stand.
+- Tick an item off as soon as it's done, and change the plan when the work changes it.
+- Items marked **You** need the user's admin rights on GitHub, Azure, Entra or Google Cloud. When one is next, tell the user exactly what to do, step by step, and wait for them to confirm it's done.
+
+@docs/ROADMAP.md
+
 ## Docs
 
-- `docs/ARCHITECTURE.md` is how the API is built. Read it before working on the API and build to match it, phase by phase (section 9). Update it whenever a design decision is made or changes.
+- `docs/ARCHITECTURE.md` is how the API is built. Read it before working on the API and build to match it. Update it whenever a design decision is made or changes.
 - `docs/RULES.md` is the rules the API enforces. The engine implements exactly these, with a test for each.
 - `README.md` is the overview for someone new to the repo.
 
