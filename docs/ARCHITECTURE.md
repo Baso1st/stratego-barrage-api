@@ -372,6 +372,7 @@ How they're used:
 - **Trunk-based,** with `main` protected, squash merges and CI on every PR: build, format check, tests, and the OpenAPI breaking-change check.
 - **Test on merge.** A merge to `main` builds the three apps with `dotnet publish`, applies the infrastructure and deploys them to test.
 - **Production on release.** Publishing a GitHub Release with a `v*` tag on `main` rebuilds that commit and deploys it to production, after approval.
+- **Dependencies stay current.** Dependabot opens PRs every week for NuGet packages and GitHub Actions, but only for releases at least 2 weeks old, so a broken or compromised release has time to be caught. NuGet's minor and patch updates come in one PR, and each major update in its own; GitHub Actions updates come in one PR. Fixes for known vulnerabilities come as soon as they're found.
 - **Infrastructure in Bicep** (`infra/`), applied on every deployment, with a one-time bootstrap for the resource groups and the GitHub Actions identities.
 - **Per environment:** an App Service Plan with the API Web App and the two Function Apps, a storage account for the Function Apps, a Cosmos DB account, a Service Bus namespace, a Key Vault, Application Insights, and a managed identity for each app.
 - **Region:** Central US.
