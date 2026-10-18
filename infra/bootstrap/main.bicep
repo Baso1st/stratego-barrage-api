@@ -6,8 +6,8 @@ targetScope = 'subscription'
 @description('Azure region for the resource groups and identities.')
 param location string = 'centralus'
 
-@description('The GitHub repository, as owner/name, whose workflows deploy the environments.')
-param repository string = 'Baso1st/stratego-barrage-api'
+@description('The GitHub repository whose workflows deploy the environments, as GitHub names it in OIDC subjects: owner@owner-id/name@repository-id. The IDs never change, so a recreated repository with the same name can\'t sign in.')
+param repository string = 'Baso1st@29257536/stratego-barrage-api@1423901951'
 
 var environments = [
   { name: 'test', githubEnvironment: 'test' }

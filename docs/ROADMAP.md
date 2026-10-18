@@ -39,10 +39,10 @@ It lands in two PRs: first the infrastructure and the pipeline that deploys it, 
 
 ### Pipeline for the infrastructure
 
-- [ ] CI on every PR, as one `build` check: compile and lint the Bicep.
-- [ ] Deploy to test on every merge to `main`: sign in to Azure with OIDC, and apply the Bicep.
-- [ ] **You:** Make CI a required check in the `main` ruleset, with the branch up to date before merging. GitHub only offers a check once it has run.
-- [ ] **You:** Squash-merge the first PR. Its deployment creates test's resources.
+- [x] CI on every PR, as one `build` check: compile and lint the Bicep.
+- [x] Deploy to test on every merge to `main`: sign in to Azure with OIDC, and apply the Bicep.
+- [x] **You:** Make CI a required check in the `main` ruleset, with the branch up to date before merging. GitHub only offers a check once it has run.
+- [x] **You:** Squash-merge the first PR. Its deployment creates test's resources.
 
 ### Solution
 
