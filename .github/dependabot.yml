@@ -1,0 +1,31 @@
+# Weekly update PRs, only for releases at least 2 weeks old. Security fixes skip the wait.
+version: 2
+updates:
+  - package-ecosystem: nuget
+    directory: /
+    schedule:
+      interval: weekly
+    cooldown:
+      default-days: 14
+    groups:
+      # The Aspire packages and the app host SDK share a version, so they move together, majors included.
+      aspire:
+        patterns: ["Aspire.*"]
+      minor-and-patch:
+        update-types: [minor, patch]
+    # These follow .NET's version, so their majors come with moving to a new .NET version.
+    ignore:
+      - dependency-name: "Microsoft.AspNetCore.*"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "Microsoft.Extensions.*"
+        update-types: ["version-update:semver-major"]
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+    cooldown:
+      default-days: 14
+    groups:
+      actions:
+        patterns: ["*"]

@@ -142,6 +142,9 @@ var apiSiteConfig = {
     { name: 'ConnectionStrings__cosmos', value: cosmos.outputs.endpoint }
     { name: 'ConnectionStrings__servicebus', value: serviceBus.outputs.fullyQualifiedNamespace }
     { name: 'ConnectionStrings__keyvault', value: keyVault.outputs.uri }
+    // A swap warms the new version up on its health endpoint, and goes ahead only once that answers 200.
+    { name: 'WEBSITE_SWAP_WARMUP_PING_PATH', value: '/health' }
+    { name: 'WEBSITE_SWAP_WARMUP_PING_STATUSES', value: '200' }
   ]
 }
 
@@ -262,5 +265,6 @@ module alerts 'modules/alerts.bicep' = if (isProduction) {
 
 output apiName string = api.name
 output apiHostName string = api.properties.defaultHostName
+output apiStagingHostName string = apiStaging.?properties.defaultHostName ?? ''
 output workerName string = worker.outputs.name
 output botName string = bot.outputs.name
