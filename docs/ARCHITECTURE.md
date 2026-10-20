@@ -246,9 +246,10 @@ If Red reconnects within the minute, the check finds a connection and nothing ha
 ### 3.15 Observability
 
 - **OpenTelemetry** traces, metrics and logs go to Application Insights from all three apps. Trace context travels through Service Bus, so one move is one trace across API, worker and bot.
-- **Telemetry stays within the free monthly allowance,** because Application Insights charges for every GB beyond it:
+- **Telemetry from both environments together stays within the free monthly allowance,** because Application Insights charges for every GB beyond it:
   - **Sampling:** at most 5 traces a second are recorded, each with its logs. While traffic is low every request is recorded; under load, the rate caps what's sent.
-  - **A daily cap** on the data collected, set well above normal use, so it only stops runaway logging.
+  - **A daily cap on each environment,** with the two caps adding up to less than the allowance. Production's is above normal use, so it only stops runaway logging. Test's is below it, so test's telemetry stops partway through each day.
+  - **No performance counters:** CPU and memory come from the App Service Plan's platform metrics, which cost nothing.
   - **Noise is filtered out:** health-check pings and SignalR keep-alive messages aren't recorded.
 - **Health checks:** the API has a health endpoint, and App Service's health check takes a failing instance out of rotation.
 - **Game metrics:** games started and finished, how they ended (including resigning, leaving and running out of time), move latency, bot thinking time, connected players, and rejected moves, which are also a sign of cheating attempts.

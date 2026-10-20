@@ -43,12 +43,16 @@ public static class ServiceDefaultsExtensions
 
         // In Azure, Application Insights only accepts Entra ID tokens, so each app signs in with its
         // managed identity. Traces are sampled at up to 5 a second (the exporter's default), and logs
-        // are kept or dropped with their trace. Metrics aren't sampled.
+        // are kept or dropped with their trace. Metrics aren't sampled. Performance counters are off:
+        // CPU and memory come from the App Service Plan's platform metrics, which cost nothing.
         if (!string.IsNullOrWhiteSpace(builder.Configuration["APPLICATIONINSIGHTS_CONNECTION_STRING"]))
         {
             var identity = ManagedIdentityId.FromUserAssignedClientId(builder.Configuration["AZURE_CLIENT_ID"]);
             builder.Services.AddOpenTelemetry().UseAzureMonitorExporter(options =>
-                options.Credential = new ManagedIdentityCredential(identity));
+            {
+                options.Credential = new ManagedIdentityCredential(identity);
+                options.EnablePerformanceCounters = false;
+            });
         }
     }
 }
