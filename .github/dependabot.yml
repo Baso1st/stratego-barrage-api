@@ -20,6 +20,17 @@ updates:
       - dependency-name: "Microsoft.Extensions.*"
         update-types: ["version-update:semver-major"]
 
+  # The SDK in global.json. Its majors come with moving to a new .NET version.
+  - package-ecosystem: dotnet-sdk
+    directory: /
+    schedule:
+      interval: weekly
+    cooldown:
+      default-days: 14
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
+
   - package-ecosystem: github-actions
     directory: /
     schedule:

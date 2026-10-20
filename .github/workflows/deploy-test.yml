@@ -20,9 +20,8 @@ jobs:
     steps:
       - uses: actions/checkout@v7
 
+      # Installs the SDK that global.json names.
       - uses: actions/setup-dotnet@v6
-        with:
-          dotnet-version: 10.0.x
 
       - name: Publish the apps
         run: |
