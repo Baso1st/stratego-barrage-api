@@ -137,6 +137,7 @@ var apiSiteConfig = {
   minTlsVersion: '1.2'
   appSettings: [
     { name: 'AZURE_CLIENT_ID', value: apiIdentity.properties.clientId }
+    { name: 'OTEL_SERVICE_NAME', value: 'app-stratego-api-${environmentName}' }
     { name: 'APPLICATIONINSIGHTS_CONNECTION_STRING', value: monitoring.outputs.connectionString }
     { name: 'ConnectionStrings__cosmos', value: cosmos.outputs.endpoint }
     { name: 'ConnectionStrings__servicebus', value: serviceBus.outputs.fullyQualifiedNamespace }
@@ -215,12 +216,12 @@ module worker 'modules/function-app.bicep' = {
     storageAccountName: functionsStorage.outputs.name
     appInsightsConnectionString: monitoring.outputs.connectionString
     connectionSettings: {
-      CosmosDb__accountEndpoint: cosmos.outputs.endpoint
-      CosmosDb__credential: 'managedidentity'
-      CosmosDb__clientId: workerIdentity.properties.clientId
-      ServiceBus__fullyQualifiedNamespace: serviceBus.outputs.fullyQualifiedNamespace
-      ServiceBus__credential: 'managedidentity'
-      ServiceBus__clientId: workerIdentity.properties.clientId
+      cosmos__accountEndpoint: cosmos.outputs.endpoint
+      cosmos__credential: 'managedidentity'
+      cosmos__clientId: workerIdentity.properties.clientId
+      servicebus__fullyQualifiedNamespace: serviceBus.outputs.fullyQualifiedNamespace
+      servicebus__credential: 'managedidentity'
+      servicebus__clientId: workerIdentity.properties.clientId
       ConnectionStrings__keyvault: keyVault.outputs.uri
     }
   }
@@ -238,9 +239,9 @@ module bot 'modules/function-app.bicep' = {
     storageAccountName: functionsStorage.outputs.name
     appInsightsConnectionString: monitoring.outputs.connectionString
     connectionSettings: {
-      ServiceBus__fullyQualifiedNamespace: serviceBus.outputs.fullyQualifiedNamespace
-      ServiceBus__credential: 'managedidentity'
-      ServiceBus__clientId: botIdentity.properties.clientId
+      servicebus__fullyQualifiedNamespace: serviceBus.outputs.fullyQualifiedNamespace
+      servicebus__credential: 'managedidentity'
+      servicebus__clientId: botIdentity.properties.clientId
       ConnectionStrings__keyvault: keyVault.outputs.uri
     }
   }

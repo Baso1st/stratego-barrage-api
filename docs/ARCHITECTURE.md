@@ -137,6 +137,20 @@ If Red reconnects within the minute, the check finds a connection and nothing ha
 - Everything is .NET 10 (the current LTS release): the API is ASP.NET Core, and the worker and the bot are Azure Functions in the isolated worker model.
 - **The engine and the computer opponent are written in C#.** The engine has table-driven tests: a case for each rule in [RULES.md](RULES.md), including every way a game ends.
 - **One games module** holds the engine, the commands (start, join, place setup, move, resign, leave, time out) and their storage. The API runs every command through it.
+- **One solution,** `StrategoBarrage.slnx`:
+
+  | Project | What it is |
+  | --- | --- |
+  | `src/StrategoBarrage.Api` | The Game API |
+  | `src/StrategoBarrage.Worker` | The game worker's Function App |
+  | `src/StrategoBarrage.Bot` | The bot's Function App |
+  | `src/StrategoBarrage.Games` | The games module |
+  | `src/StrategoBarrage.ServiceDefaults` | What all three apps share: telemetry and health checks |
+  | `src/StrategoBarrage.AppHost` | The Aspire app host, for local development (section 3.16) |
+  | `tests/StrategoBarrage.Games.Tests` | Unit tests for the games module |
+  | `tests/StrategoBarrage.Api.Tests` | Integration tests: the apps together, through the app host |
+
+- **Tests** use xUnit v3, with Shouldly for assertions.
 
 ### 3.5 REST and SignalR
 
@@ -233,7 +247,7 @@ If Red reconnects within the minute, the check finds a connection and nothing ha
 
 - **OpenTelemetry** traces, metrics and logs go to Application Insights from all three apps. Trace context travels through Service Bus, so one move is one trace across API, worker and bot.
 - **Telemetry stays within the free monthly allowance,** because Application Insights charges for every GB beyond it:
-  - **Sampling:** only a share of routine requests and their traces is recorded, not every one.
+  - **Sampling:** at most 5 traces a second are recorded, each with its logs. While traffic is low every request is recorded; under load, the rate caps what's sent.
   - **A daily cap** on the data collected, set well above normal use, so it only stops runaway logging.
   - **Noise is filtered out:** health-check pings and SignalR keep-alive messages aren't recorded.
 - **Health checks:** the API has a health endpoint, and App Service's health check takes a failing instance out of rotation.
@@ -369,7 +383,7 @@ How they're used:
 
 ## 6. Delivery
 
-- **Trunk-based,** with `main` protected, squash merges and CI on every PR: build, format check, tests, and the OpenAPI breaking-change check.
+- **Trunk-based,** with `main` protected, squash merges and CI on every PR: build, format check, tests, and the OpenAPI breaking-change check (oasdiff, against the last release's document).
 - **Test on merge.** A merge to `main` builds the three apps with `dotnet publish`, applies the infrastructure and deploys them to test.
 - **Production on release.** Publishing a GitHub Release with a `v*` tag on `main` rebuilds that commit and deploys it to production, after approval.
 - **Dependencies stay current.** Dependabot opens PRs every week for NuGet packages and GitHub Actions, but only for releases at least 2 weeks old, so a broken or compromised release has time to be caught. NuGet's minor and patch updates come in one PR, and each major update in its own; GitHub Actions updates come in one PR. Fixes for known vulnerabilities come as soon as they're found.

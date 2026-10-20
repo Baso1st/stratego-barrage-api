@@ -1,0 +1,84 @@
+# Formatting and code style, enforced by the build and by `dotnet format` in CI.
+root = true
+
+[*]
+charset = utf-8
+end_of_line = lf
+indent_style = space
+indent_size = 4
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+[*.{bicep,bicepparam,json,jsonc,yml,yaml,xml,csproj,props,targets,slnx}]
+indent_size = 2
+
+[*.md]
+trim_trailing_whitespace = false
+
+[*.cs]
+# Layout
+max_line_length = 120
+csharp_new_line_before_open_brace = all
+csharp_new_line_before_else = true
+csharp_new_line_before_catch = true
+csharp_new_line_before_finally = true
+csharp_indent_case_contents = true
+csharp_indent_switch_labels = true
+csharp_space_after_keywords_in_control_flow_statements = true
+csharp_preserve_single_line_statements = false
+
+# Usings and namespaces
+dotnet_sort_system_directives_first = true
+csharp_using_directive_placement = outside_namespace
+csharp_style_namespace_declarations = file_scoped
+
+# Language
+csharp_style_var_for_built_in_types = true
+csharp_style_var_when_type_is_apparent = true
+csharp_style_var_elsewhere = true
+csharp_prefer_braces = true
+dotnet_style_qualification_for_field = false
+dotnet_style_qualification_for_property = false
+dotnet_style_qualification_for_method = false
+dotnet_style_qualification_for_event = false
+dotnet_style_predefined_type_for_locals_parameters_members = true
+dotnet_style_readonly_field = true
+dotnet_style_require_accessibility_modifiers = for_non_interface_members
+
+# Naming: PascalCase for types, members and constants; _camelCase for other private fields
+dotnet_naming_rule.constants.severity = warning
+dotnet_naming_rule.constants.symbols = constants
+dotnet_naming_rule.constants.style = pascal_case
+dotnet_naming_symbols.constants.applicable_kinds = field, local
+dotnet_naming_symbols.constants.required_modifiers = const
+
+dotnet_naming_rule.static_readonly_fields.severity = warning
+dotnet_naming_rule.static_readonly_fields.symbols = static_readonly_fields
+dotnet_naming_rule.static_readonly_fields.style = pascal_case
+dotnet_naming_symbols.static_readonly_fields.applicable_kinds = field
+dotnet_naming_symbols.static_readonly_fields.required_modifiers = static, readonly
+
+dotnet_naming_rule.private_fields.severity = warning
+dotnet_naming_rule.private_fields.symbols = private_fields
+dotnet_naming_rule.private_fields.style = underscore_camel_case
+dotnet_naming_symbols.private_fields.applicable_kinds = field
+dotnet_naming_symbols.private_fields.applicable_accessibilities = private
+dotnet_naming_style.underscore_camel_case.capitalization = camel_case
+dotnet_naming_style.underscore_camel_case.required_prefix = _
+
+dotnet_naming_rule.types_and_members.severity = warning
+dotnet_naming_rule.types_and_members.symbols = types_and_members
+dotnet_naming_rule.types_and_members.style = pascal_case
+dotnet_naming_symbols.types_and_members.applicable_kinds = namespace, class, struct, interface, enum, delegate, method, property, event
+dotnet_naming_style.pascal_case.capitalization = pascal_case
+
+# Which of the rules above fail the build. The build reads only these severities, not the ":severity" suffix.
+dotnet_diagnostic.IDE0003.severity = warning # this. qualification
+dotnet_diagnostic.IDE0007.severity = warning # var
+dotnet_diagnostic.IDE0011.severity = warning # braces
+dotnet_diagnostic.IDE0040.severity = warning # accessibility modifiers
+dotnet_diagnostic.IDE0044.severity = warning # readonly fields
+dotnet_diagnostic.IDE0049.severity = warning # predefined types
+dotnet_diagnostic.IDE0065.severity = warning # using placement
+dotnet_diagnostic.IDE0161.severity = warning # file-scoped namespaces
+dotnet_diagnostic.IDE1006.severity = warning # naming
