@@ -10,8 +10,19 @@ permissions:
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      OPENAPI_DOCUMENT: src/StrategoBarrage.Api/StrategoBarrage.Api.json
+      OASDIFF_VERSION: 1.33.0
+      OASDIFF_SHA256: 43a4e328e2d13ba1552d760aa68d2485c75c5621f309f6ff64ae895188345247
     steps:
       - uses: actions/checkout@v7
+        with:
+          # All history and tags, so the breaking-change check can read the last release's document.
+          fetch-depth: 0
+
+      - uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: 10.0.x
 
       - name: Compile and lint the Bicep
         env:
@@ -23,3 +34,37 @@ jobs:
           az bicep lint --file infra/main.bicep
           az bicep build-params --file infra/test.bicepparam --stdout > /dev/null
           az bicep build-params --file infra/prod.bicepparam --stdout > /dev/null
+
+      - name: Build
+        run: dotnet build
+
+      - name: Check formatting
+        run: dotnet format --verify-no-changes --no-restore
+
+      # The integration tests reach the API over HTTPS, so its development certificate has to exist and be trusted.
+      - name: Trust the HTTPS development certificate
+        run: |
+          cert_dirs="$HOME/.aspnet/dev-certs/trust:/usr/lib/ssl/certs"
+          SSL_CERT_DIR="$cert_dirs" dotnet dev-certs https --trust
+          echo "SSL_CERT_DIR=$cert_dirs" >> "$GITHUB_ENV"
+
+      - name: Run the tests
+        run: dotnet test --no-build
+
+      # The build writes the document from the code, so a difference means it wasn't rebuilt before committing.
+      - name: Check the OpenAPI document is up to date
+        run: git diff --exit-code -- "$OPENAPI_DOCUMENT"
+
+      - name: Check the OpenAPI document for breaking changes
+        run: |
+          release=$(git tag --list 'v*' --sort=-version:refname | head -n 1)
+          if [ -z "$release" ]; then
+            echo "No release yet, so there's nothing to compare against."
+            exit 0
+          fi
+          curl --silent --show-error --fail --location --output "$RUNNER_TEMP/oasdiff.tar.gz" \
+            "https://github.com/oasdiff/oasdiff/releases/download/v$OASDIFF_VERSION/oasdiff_${OASDIFF_VERSION}_linux_amd64.tar.gz"
+          echo "$OASDIFF_SHA256  $RUNNER_TEMP/oasdiff.tar.gz" | sha256sum --check
+          tar -xzf "$RUNNER_TEMP/oasdiff.tar.gz" -C "$RUNNER_TEMP" oasdiff
+          echo "Comparing with $release."
+          "$RUNNER_TEMP/oasdiff" breaking "$release:$OPENAPI_DOCUMENT" "$OPENAPI_DOCUMENT" --fail-on ERR

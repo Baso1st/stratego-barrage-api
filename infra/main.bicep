@@ -137,10 +137,14 @@ var apiSiteConfig = {
   minTlsVersion: '1.2'
   appSettings: [
     { name: 'AZURE_CLIENT_ID', value: apiIdentity.properties.clientId }
+    { name: 'OTEL_SERVICE_NAME', value: 'app-stratego-api-${environmentName}' }
     { name: 'APPLICATIONINSIGHTS_CONNECTION_STRING', value: monitoring.outputs.connectionString }
     { name: 'ConnectionStrings__cosmos', value: cosmos.outputs.endpoint }
     { name: 'ConnectionStrings__servicebus', value: serviceBus.outputs.fullyQualifiedNamespace }
     { name: 'ConnectionStrings__keyvault', value: keyVault.outputs.uri }
+    // A swap warms the new version up on its health endpoint, and goes ahead only once that answers 200.
+    { name: 'WEBSITE_SWAP_WARMUP_PING_PATH', value: '/health' }
+    { name: 'WEBSITE_SWAP_WARMUP_PING_STATUSES', value: '200' }
   ]
 }
 
@@ -215,12 +219,12 @@ module worker 'modules/function-app.bicep' = {
     storageAccountName: functionsStorage.outputs.name
     appInsightsConnectionString: monitoring.outputs.connectionString
     connectionSettings: {
-      CosmosDb__accountEndpoint: cosmos.outputs.endpoint
-      CosmosDb__credential: 'managedidentity'
-      CosmosDb__clientId: workerIdentity.properties.clientId
-      ServiceBus__fullyQualifiedNamespace: serviceBus.outputs.fullyQualifiedNamespace
-      ServiceBus__credential: 'managedidentity'
-      ServiceBus__clientId: workerIdentity.properties.clientId
+      cosmos__accountEndpoint: cosmos.outputs.endpoint
+      cosmos__credential: 'managedidentity'
+      cosmos__clientId: workerIdentity.properties.clientId
+      servicebus__fullyQualifiedNamespace: serviceBus.outputs.fullyQualifiedNamespace
+      servicebus__credential: 'managedidentity'
+      servicebus__clientId: workerIdentity.properties.clientId
       ConnectionStrings__keyvault: keyVault.outputs.uri
     }
   }
@@ -238,9 +242,9 @@ module bot 'modules/function-app.bicep' = {
     storageAccountName: functionsStorage.outputs.name
     appInsightsConnectionString: monitoring.outputs.connectionString
     connectionSettings: {
-      ServiceBus__fullyQualifiedNamespace: serviceBus.outputs.fullyQualifiedNamespace
-      ServiceBus__credential: 'managedidentity'
-      ServiceBus__clientId: botIdentity.properties.clientId
+      servicebus__fullyQualifiedNamespace: serviceBus.outputs.fullyQualifiedNamespace
+      servicebus__credential: 'managedidentity'
+      servicebus__clientId: botIdentity.properties.clientId
       ConnectionStrings__keyvault: keyVault.outputs.uri
     }
   }
@@ -261,5 +265,6 @@ module alerts 'modules/alerts.bicep' = if (isProduction) {
 
 output apiName string = api.name
 output apiHostName string = api.properties.defaultHostName
+output apiStagingHostName string = apiStaging.?properties.defaultHostName ?? ''
 output workerName string = worker.outputs.name
 output botName string = bot.outputs.name

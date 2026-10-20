@@ -46,24 +46,24 @@ It lands in two PRs: first the infrastructure and the pipeline that deploys it, 
 
 ### Solution
 
-- [ ] The .NET 10 solution: the API, the worker, the bot, the games module, the Aspire app host, shared service defaults, and the test projects.
-- [ ] Formatting rules in `.editorconfig`, shared build settings, and central package versions.
-- [ ] Service defaults for all three apps: OpenTelemetry to Application Insights, with sampling, and health checks.
-- [ ] The API: its health endpoint, Problem Details for errors, and the OpenAPI document generated at build time.
-- [ ] The worker and the bot: Function Apps (isolated worker model) that start and send telemetry.
-- [ ] The Aspire app host: the three apps, with the Cosmos DB and Service Bus emulators.
+- [x] The .NET 10 solution: the API, the worker, the bot, the games module, the Aspire app host, shared service defaults, and the test projects.
+- [x] Formatting rules in `.editorconfig`, shared build settings, and central package versions.
+- [x] Service defaults for all three apps: OpenTelemetry to Application Insights, with sampling, and health checks.
+- [x] The API: its health endpoint, Problem Details for errors, and the OpenAPI document generated at build time.
+- [x] The worker and the bot: Function Apps (isolated worker model) that start and send telemetry.
+- [x] The Aspire app host: the three apps, with the Cosmos DB and Service Bus emulators.
 
 ### Pipeline for the apps
 
-- [ ] CI also builds the solution, checks formatting, runs the tests, and checks the OpenAPI document for breaking changes against the last release.
-- [ ] Deploy to test also publishes the three apps, deploys them, and checks the API's health endpoint.
-- [ ] Release to production on a published `v*` release: check the tag is on `main`, rebuild that commit, apply the Bicep, deploy the API to the staging slot, warm it up and swap it in, and deploy the Function Apps in place.
-- [ ] Dependabot (`.github/dependabot.yml`): weekly PRs for NuGet packages and GitHub Actions, only for releases at least 2 weeks old.
+- [x] CI also builds the solution, checks formatting, runs the tests, and checks the OpenAPI document for breaking changes against the last release.
+- [x] Deploy to test also publishes the three apps, deploys them, and checks the API's health endpoint.
+- [x] Release to production on a published `v*` release: check the tag is on `main`, rebuild that commit, apply the Bicep, deploy the API to the staging slot, warm it up and swap it in, and deploy the Function Apps in place.
+- [x] Dependabot (`.github/dependabot.yml`): weekly PRs for NuGet packages and GitHub Actions, only for releases at least 2 weeks old.
 
 ### Tests
 
-- [ ] Unit and integration test projects, run by CI.
-- [ ] Integration test: the API's health endpoint, through the Aspire app host.
+- [x] Unit and integration test projects, run by CI.
+- [x] Integration test: the API's health endpoint, through the Aspire app host.
 
 ### Release
 

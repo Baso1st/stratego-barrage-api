@@ -1,0 +1,47 @@
+<Project>
+
+  <!-- Every package's version, in one place. Projects reference packages without a version. -->
+  <PropertyGroup>
+    <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+    <CentralPackageTransitivePinningEnabled>true</CentralPackageTransitivePinningEnabled>
+  </PropertyGroup>
+
+  <!-- Packages we only get through other packages, pinned to a version with a known vulnerability fixed. -->
+  <ItemGroup Label="Security fixes">
+    <PackageVersion Include="MessagePack" Version="2.5.307" />
+  </ItemGroup>
+
+  <ItemGroup Label="Aspire">
+    <PackageVersion Include="Aspire.Hosting.Azure.CosmosDB" Version="13.6.0" />
+    <PackageVersion Include="Aspire.Hosting.Azure.Functions" Version="13.6.0" />
+    <PackageVersion Include="Aspire.Hosting.Azure.ServiceBus" Version="13.6.0" />
+    <PackageVersion Include="Aspire.Hosting.Testing" Version="13.6.0" />
+  </ItemGroup>
+
+  <ItemGroup Label="ASP.NET Core">
+    <PackageVersion Include="Microsoft.AspNetCore.OpenApi" Version="10.0.12" />
+    <PackageVersion Include="Microsoft.Extensions.ApiDescription.Server" Version="10.0.12" />
+    <PackageVersion Include="Microsoft.Extensions.Diagnostics.HealthChecks" Version="10.0.12" />
+  </ItemGroup>
+
+  <ItemGroup Label="Azure Functions">
+    <PackageVersion Include="Microsoft.Azure.Functions.Worker" Version="2.52.0" />
+    <PackageVersion Include="Microsoft.Azure.Functions.Worker.OpenTelemetry" Version="1.2.0" />
+    <PackageVersion Include="Microsoft.Azure.Functions.Worker.Sdk" Version="2.1.0" />
+  </ItemGroup>
+
+  <ItemGroup Label="Telemetry">
+    <PackageVersion Include="Azure.Identity" Version="1.21.0" />
+    <PackageVersion Include="Azure.Monitor.OpenTelemetry.Exporter" Version="1.9.0" />
+    <PackageVersion Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" Version="1.19.1" />
+    <PackageVersion Include="OpenTelemetry.Extensions.Hosting" Version="1.19.1" />
+    <PackageVersion Include="OpenTelemetry.Instrumentation.AspNetCore" Version="1.19.0" />
+    <PackageVersion Include="OpenTelemetry.Instrumentation.Http" Version="1.19.0" />
+  </ItemGroup>
+
+  <ItemGroup Label="Tests">
+    <PackageVersion Include="Shouldly" Version="4.3.0" />
+    <PackageVersion Include="xunit.v3.mtp-v2" Version="4.0.1" />
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,20 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/StrategoBarrage.Api/StrategoBarrage.Api.csproj" />
+    <Project Path="src/StrategoBarrage.AppHost/StrategoBarrage.AppHost.csproj" />
+    <Project Path="src/StrategoBarrage.Bot/StrategoBarrage.Bot.csproj" />
+    <Project Path="src/StrategoBarrage.Games/StrategoBarrage.Games.csproj" />
+    <Project Path="src/StrategoBarrage.ServiceDefaults/StrategoBarrage.ServiceDefaults.csproj" />
+    <Project Path="src/StrategoBarrage.Worker/StrategoBarrage.Worker.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/StrategoBarrage.Api.Tests/StrategoBarrage.Api.Tests.csproj" />
+    <Project Path="tests/StrategoBarrage.Games.Tests/StrategoBarrage.Games.Tests.csproj" />
+  </Folder>
+  <Folder Name="/Solution Items/">
+    <File Path=".editorconfig" />
+    <File Path="Directory.Build.props" />
+    <File Path="Directory.Packages.props" />
+    <File Path="global.json" />
+  </Folder>
+</Solution>

@@ -15,9 +15,36 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Publish the apps
+        run: |
+          dotnet publish src/StrategoBarrage.Api --output publish/api
+          dotnet publish src/StrategoBarrage.Worker --output publish/worker
+          dotnet publish src/StrategoBarrage.Bot --output publish/bot
+
+      # The Function Apps need the hidden .azurefunctions folder in their output.
+      - uses: actions/upload-artifact@v7
+        with:
+          name: apps
+          path: publish/
+          include-hidden-files: true
+
   infrastructure:
     runs-on: ubuntu-latest
     environment: test
+    outputs:
+      apiName: ${{ steps.apply.outputs.apiName }}
+      apiHostName: ${{ steps.apply.outputs.apiHostName }}
+      workerName: ${{ steps.apply.outputs.workerName }}
+      botName: ${{ steps.apply.outputs.botName }}
     steps:
       - uses: actions/checkout@v7
 
@@ -29,8 +56,51 @@ jobs:
           subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
 
       - name: Apply the infrastructure
-        run: >
-          az deployment group create
-          --resource-group rg-stratego-api-test
-          --name infra-${{ github.run_number }}
-          --parameters infra/test.bicepparam
+        id: apply
+        run: |
+          outputs=$(az deployment group create \
+            --resource-group rg-stratego-api-test \
+            --name infra-${{ github.run_number }} \
+            --parameters infra/test.bicepparam \
+            --query properties.outputs)
+          jq -r 'to_entries[] | "\(.key)=\(.value.value)"' <<< "$outputs" >> "$GITHUB_OUTPUT"
+
+  apps:
+    needs: [build, infrastructure]
+    runs-on: ubuntu-latest
+    environment: test
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/download-artifact@v8
+        with:
+          name: apps
+          path: publish
+
+      - name: Sign in to Azure
+        uses: azure/login@v3
+        with:
+          client-id: ${{ vars.AZURE_CLIENT_ID }}
+          tenant-id: ${{ vars.AZURE_TENANT_ID }}
+          subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Deploy the API
+        uses: azure/webapps-deploy@v3
+        with:
+          app-name: ${{ needs.infrastructure.outputs.apiName }}
+          package: publish/api
+
+      - name: Deploy the worker
+        uses: Azure/functions-action@v1
+        with:
+          app-name: ${{ needs.infrastructure.outputs.workerName }}
+          package: publish/worker
+
+      - name: Deploy the bot
+        uses: Azure/functions-action@v1
+        with:
+          app-name: ${{ needs.infrastructure.outputs.botName }}
+          package: publish/bot
+
+      - name: Check the API's health endpoint
+        run: bash .github/scripts/wait-until-healthy.sh "https://${{ needs.infrastructure.outputs.apiHostName }}/health"

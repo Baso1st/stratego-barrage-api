@@ -1,0 +1,112 @@
+name: Release to production
+
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: read
+  id-token: write
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+jobs:
+  build:
+    if: startsWith(github.event.release.tag_name, 'v')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: Check the tag is on main
+        run: |
+          if ! git merge-base --is-ancestor "$GITHUB_SHA" origin/main; then
+            echo "::error::$GITHUB_REF_NAME isn't on main."
+            exit 1
+          fi
+
+      - uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Publish the apps
+        run: |
+          dotnet publish src/StrategoBarrage.Api --output publish/api
+          dotnet publish src/StrategoBarrage.Worker --output publish/worker
+          dotnet publish src/StrategoBarrage.Bot --output publish/bot
+
+      # The Function Apps need the hidden .azurefunctions folder in their output.
+      - uses: actions/upload-artifact@v7
+        with:
+          name: apps
+          path: publish/
+          include-hidden-files: true
+
+  # Everything that touches production is in this one job, so each release is approved once.
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/download-artifact@v8
+        with:
+          name: apps
+          path: publish
+
+      - name: Sign in to Azure
+        uses: azure/login@v3
+        with:
+          client-id: ${{ vars.AZURE_CLIENT_ID }}
+          tenant-id: ${{ vars.AZURE_TENANT_ID }}
+          subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Apply the infrastructure
+        id: infrastructure
+        env:
+          ALERT_EMAIL: ${{ vars.ALERT_EMAIL }}
+        run: |
+          outputs=$(az deployment group create \
+            --resource-group rg-stratego-api-prod \
+            --name infra-${{ github.run_number }} \
+            --parameters infra/prod.bicepparam \
+            --query properties.outputs)
+          jq -r 'to_entries[] | "\(.key)=\(.value.value)"' <<< "$outputs" >> "$GITHUB_OUTPUT"
+
+      - name: Deploy the API to the staging slot
+        uses: azure/webapps-deploy@v3
+        with:
+          app-name: ${{ steps.infrastructure.outputs.apiName }}
+          slot-name: staging
+          package: publish/api
+
+      - name: Check the staging slot's health endpoint
+        run: bash .github/scripts/wait-until-healthy.sh "https://${{ steps.infrastructure.outputs.apiStagingHostName }}/health"
+
+      # The previous version stays in the staging slot; swapping back is the rollback.
+      - name: Swap the staging slot into production
+        run: >
+          az webapp deployment slot swap
+          --resource-group rg-stratego-api-prod
+          --name ${{ steps.infrastructure.outputs.apiName }}
+          --slot staging
+          --target-slot production
+
+      - name: Check production's health endpoint
+        run: bash .github/scripts/wait-until-healthy.sh "https://${{ steps.infrastructure.outputs.apiHostName }}/health"
+
+      - name: Deploy the worker
+        uses: Azure/functions-action@v1
+        with:
+          app-name: ${{ steps.infrastructure.outputs.workerName }}
+          package: publish/worker
+
+      - name: Deploy the bot
+        uses: Azure/functions-action@v1
+        with:
+          app-name: ${{ steps.infrastructure.outputs.botName }}
+          package: publish/bot

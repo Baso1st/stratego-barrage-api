@@ -1,0 +1,21 @@
+<Project Sdk="Aspire.AppHost.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <AspireUseCliBundle>true</AspireUseCliBundle>
+    <UserSecretsId>86d32faf-7dac-4ed9-b319-083f013b9ab9</UserSecretsId>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Aspire.Hosting.Azure.CosmosDB" />
+    <PackageReference Include="Aspire.Hosting.Azure.Functions" />
+    <PackageReference Include="Aspire.Hosting.Azure.ServiceBus" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\StrategoBarrage.Api\StrategoBarrage.Api.csproj" />
+    <ProjectReference Include="..\StrategoBarrage.Worker\StrategoBarrage.Worker.csproj" />
+    <ProjectReference Include="..\StrategoBarrage.Bot\StrategoBarrage.Bot.csproj" />
+  </ItemGroup>
+
+</Project>
