@@ -28,9 +28,8 @@ jobs:
             exit 1
           fi
 
+      # Installs the SDK that global.json names, so the release builds with the same one as test's build.
       - uses: actions/setup-dotnet@v6
-        with:
-          dotnet-version: 10.0.x
 
       - name: Publish the apps
         run: |

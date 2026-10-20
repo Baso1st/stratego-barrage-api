@@ -47,7 +47,7 @@ It lands in two PRs: first the infrastructure and the pipeline that deploys it, 
 ### Solution
 
 - [x] The .NET 10 solution: the API, the worker, the bot, the games module, the Aspire app host, shared service defaults, and the test projects.
-- [x] Formatting rules in `.editorconfig`, shared build settings, and central package versions.
+- [x] Formatting rules in `.editorconfig`, shared build settings, central package versions, and the SDK version in `global.json`.
 - [x] Service defaults for all three apps: OpenTelemetry to Application Insights, with sampling, and health checks.
 - [x] The API: its health endpoint, Problem Details for errors, and the OpenAPI document generated at build time.
 - [x] The worker and the bot: Function Apps (isolated worker model) that start and send telemetry.
@@ -58,7 +58,7 @@ It lands in two PRs: first the infrastructure and the pipeline that deploys it, 
 - [x] CI also builds the solution, checks formatting, runs the tests, and checks the OpenAPI document for breaking changes against the last release.
 - [x] Deploy to test also publishes the three apps, deploys them, and checks the API's health endpoint.
 - [x] Release to production on a published `v*` release: check the tag is on `main`, rebuild that commit, apply the Bicep, deploy the API to the staging slot, warm it up and swap it in, and deploy the Function Apps in place.
-- [x] Dependabot (`.github/dependabot.yml`): weekly PRs for NuGet packages and GitHub Actions, only for releases at least 2 weeks old.
+- [x] Dependabot (`.github/dependabot.yml`): weekly PRs for NuGet packages, the .NET SDK and GitHub Actions, only for releases at least 2 weeks old.
 
 ### Tests
 

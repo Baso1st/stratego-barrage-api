@@ -27,7 +27,7 @@ The back end for **Stratego Barrage**, the fast, small-army variant of the Strat
 
 ## Local development
 
-You need the [.NET 10 SDK](https://dotnet.microsoft.com/download/dotnet/10.0) and [Docker Desktop](https://www.docker.com/products/docker-desktop/).
+You need the [.NET 10 SDK](https://dotnet.microsoft.com/download/dotnet/10.0), at the version in `global.json` or a later patch of it, and [Docker Desktop](https://www.docker.com/products/docker-desktop/).
 
 An Aspire app host starts the API, the worker and the bot, with emulators for Cosmos DB and Service Bus running in Docker. Its dashboard shows the traces and logs from all three apps in one place. Locally, the API accepts tokens from a development issuer, so the tests and a client running locally work without the real sign-in.
 
