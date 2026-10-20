@@ -67,7 +67,7 @@ It lands in two PRs: first the infrastructure and the pipeline that deploys it, 
 
 ### Release
 
-- [ ] The health endpoint answers on test, and telemetry from all three apps reaches Application Insights.
+- [x] The health endpoint answers on test, and telemetry from all three apps reaches Application Insights.
 - [ ] **You:** Publish release `v0.1.0` and approve its deployment.
 - [ ] The health endpoint answers on production, and a swap back to the previous version works.
 
