@@ -385,8 +385,10 @@ How they're used:
 ## 6. Delivery
 
 - **Trunk-based,** with `main` protected, squash merges and CI on every PR: build, format check, tests, a check that the committed OpenAPI document matches the code, and the breaking-change check (oasdiff, against the last release's document).
+- **Code coverage, for information.** CI shows the tests' line and branch coverage, per project and class, on each run's summary page. It has no minimum, so it never fails a build.
 - **Test on merge.** A merge to `main` builds the three apps with `dotnet publish`, applies the infrastructure, deploys them to test, and checks the API's health endpoint.
 - **Production on release.** Publishing a GitHub Release with a `v*` tag on `main` rebuilds that commit and deploys it to production, after approval.
+- **Rolling back is a workflow run by hand.** Run from the live release's tag, "Roll back production" swaps the staging slot back into production, after approval, and checks production's health endpoint. Running it again goes forward again. It never runs at the same time as a release.
 - **One SDK version.** `global.json` names the .NET SDK, and CI, test and production all build with it. A new SDK reaches production only after it's been through test.
 - **Dependencies stay current.** Dependabot opens PRs every week for NuGet packages, the .NET SDK and GitHub Actions, but only for releases at least 2 weeks old, so a broken or compromised release has time to be caught. Fixes for known vulnerabilities come as soon as they're found.
   - **NuGet:** minor and patch updates come in one PR, and each major update in its own. The Aspire packages share a version, so they always come together in one PR.
@@ -394,6 +396,14 @@ How they're used:
   - **GitHub Actions:** all updates come in one PR.
 - **Infrastructure in Bicep** (`infra/`), applied on every deployment, with a one-time bootstrap for the resource groups and the GitHub Actions identities.
 - **Per environment:** an App Service Plan with the API Web App and the two Function Apps, a storage account for the Function Apps, a Cosmos DB account, a Service Bus namespace, a Key Vault, Application Insights, and a managed identity for each app.
+- **The API's addresses,** each with its health endpoint at `/health`:
+
+  | Environment | Address |
+  | --- | --- |
+  | Test | `https://app-stratego-api-test.azurewebsites.net` |
+  | Production | `https://app-stratego-api-prod.azurewebsites.net` |
+  | Production's staging slot | `https://app-stratego-api-prod-staging.azurewebsites.net` |
+
 - **Region:** Central US.
 
 ## 7. Cost and capacity

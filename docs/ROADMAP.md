@@ -9,7 +9,7 @@ The plan from an empty repository to the API running in production, phase by pha
 
 The solution builds and tests in CI, both environments exist, and every merge and release deploys itself. The apps run on test and production, doing nothing yet but answering health checks.
 
-It lands in two PRs: first the infrastructure and the pipeline that deploys it, so test exists and the deployment path is proven before there's any code; then the solution, and the pipeline steps that build and deploy it.
+It lands in three PRs: first the infrastructure and the pipeline that deploys it, so test exists and the deployment path is proven before there's any code; then the solution, and the pipeline steps that build and deploy it; then the workflow that rolls production back.
 
 ### GitHub
 
@@ -59,6 +59,7 @@ It lands in two PRs: first the infrastructure and the pipeline that deploys it, 
 - [x] Deploy to test also publishes the three apps, deploys them, and checks the API's health endpoint.
 - [x] Release to production on a published `v*` release: check the tag is on `main`, rebuild that commit, apply the Bicep, deploy the API to the staging slot, warm it up and swap it in, and deploy the Function Apps in place.
 - [x] Dependabot (`.github/dependabot.yml`): weekly PRs for NuGet packages, the .NET SDK and GitHub Actions, only for releases at least 2 weeks old.
+- [x] Roll back production (`.github/workflows/rollback.yml`), run by hand from the live release's tag: check the staging slot's health, swap it into production, and check production's health.
 
 ### Tests
 
@@ -68,8 +69,11 @@ It lands in two PRs: first the infrastructure and the pipeline that deploys it, 
 ### Release
 
 - [x] The health endpoint answers on test, and telemetry from all three apps reaches Application Insights.
-- [ ] **You:** Publish release `v0.1.0` and approve its deployment.
-- [ ] The health endpoint answers on production, and a swap back to the previous version works.
+- [x] **You:** Publish release `v0.1.0` and approve its deployment.
+- [x] The health endpoint answers on production.
+- [ ] **You:** Publish release `v0.1.1`, with the rollback workflow, and approve its deployment.
+- [ ] **You:** Run "Roll back production" from `v0.1.1` and approve it, then run it again.
+- [ ] The first run puts v0.1.0 back in production, and the second puts v0.1.1 back.
 
 ## Phase 2: Registration and profiles
 
@@ -97,6 +101,7 @@ Players sign in with Google, and the API registers them and returns their profil
 
 ### Tests
 
+- [ ] Code coverage: CI shows line and branch coverage on each run's summary page.
 - [ ] The Cosmos DB emulator runs in CI.
 - [ ] `/v1/me`: `401` without a valid token, registration on the first call, the same player on every call after it, and a different player for a different issuer or subject.
 
