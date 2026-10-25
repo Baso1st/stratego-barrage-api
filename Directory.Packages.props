@@ -12,10 +12,10 @@
   </ItemGroup>
 
   <ItemGroup Label="Aspire">
-    <PackageVersion Include="Aspire.Hosting.Azure.CosmosDB" Version="13.6.0" />
-    <PackageVersion Include="Aspire.Hosting.Azure.Functions" Version="13.6.0" />
-    <PackageVersion Include="Aspire.Hosting.Azure.ServiceBus" Version="13.6.0" />
-    <PackageVersion Include="Aspire.Hosting.Testing" Version="13.6.0" />
+    <PackageVersion Include="Aspire.Hosting.Azure.CosmosDB" Version="13.6.1" />
+    <PackageVersion Include="Aspire.Hosting.Azure.Functions" Version="13.6.1" />
+    <PackageVersion Include="Aspire.Hosting.Azure.ServiceBus" Version="13.6.1" />
+    <PackageVersion Include="Aspire.Hosting.Testing" Version="13.6.1" />
   </ItemGroup>
 
   <ItemGroup Label="ASP.NET Core">
@@ -32,7 +32,7 @@
 
   <ItemGroup Label="Telemetry">
     <PackageVersion Include="Azure.Identity" Version="1.21.0" />
-    <PackageVersion Include="Azure.Monitor.OpenTelemetry.Exporter" Version="1.9.0" />
+    <PackageVersion Include="Azure.Monitor.OpenTelemetry.Exporter" Version="1.10.0" />
     <PackageVersion Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" Version="1.19.1" />
     <PackageVersion Include="OpenTelemetry.Extensions.Hosting" Version="1.19.1" />
     <PackageVersion Include="OpenTelemetry.Instrumentation.AspNetCore" Version="1.19.0" />
@@ -41,7 +41,7 @@
 
   <ItemGroup Label="Tests">
     <PackageVersion Include="Shouldly" Version="4.3.0" />
-    <PackageVersion Include="xunit.v3.mtp-v2" Version="4.0.1" />
+    <PackageVersion Include="xunit.v3.mtp-v2" Version="4.0.2" />
   </ItemGroup>
 
 </Project>
