@@ -1,4 +1,5 @@
-// Production alerts, by email: the availability target's error budget, and 80% of capacity.
+// Production alerts, by email: the availability target's error budget, 80% of capacity, and
+// players nearing External ID's free monthly active users.
 
 param environmentName string
 param tags object
@@ -157,3 +158,50 @@ resource capacity 'Microsoft.Insights/metricAlerts@2018-03-01' = [
     }
   }
 ]
+
+// Both tenants share 50,000 free monthly active users. Each player has one document in `logins`,
+// and players outnumber monthly active users, so this fires first and leaves room for test's users.
+resource players 'Microsoft.Insights/metricAlerts@2018-03-01' = {
+  name: 'players-${environmentName}'
+  location: 'global'
+  tags: tags
+  properties: {
+    description: '40,000 players: turn off sign-up before External ID\'s free 50,000 monthly active users run out.'
+    severity: 2
+    enabled: true
+    scopes: [
+      cosmosAccountId
+    ]
+    windowSize: 'PT1H'
+    evaluationFrequency: 'PT1H'
+    criteria: {
+      'odata.type': 'Microsoft.Azure.Monitor.SingleResourceMultipleMetricCriteria'
+      allOf: [
+        {
+          criterionType: 'StaticThresholdCriterion'
+          name: 'at-least-40000'
+          metricNamespace: 'Microsoft.DocumentDB/databaseAccounts'
+          metricName: 'DocumentCountV2'
+          dimensions: [
+            {
+              name: 'CollectionName'
+              operator: 'Include'
+              values: [
+                'logins'
+              ]
+            }
+          ]
+          operator: 'GreaterThanOrEqual'
+          threshold: 40000
+          timeAggregation: 'Average'
+        }
+      ]
+    }
+    autoMitigate: true
+    actions: [
+      {
+        actionGroupId: actionGroup.id
+      }
+    ]
+  }
+}

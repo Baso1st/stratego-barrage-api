@@ -189,8 +189,9 @@ If Red reconnects within the minute, the check finds a connection and nothing ha
 
 ### 3.8 Sign-in: Google, through Microsoft Entra External ID
 
-- **OIDC and OAuth 2.0 together.** OIDC signs the player in (an ID token says who they are). OAuth 2.0 lets the app call the API (an access token with the API's scopes). Clients use the authorization code flow with PKCE (MSAL), and the API validates JWT bearer tokens.
+- **OIDC and OAuth 2.0 together.** OIDC signs the player in (an ID token says who they are). OAuth 2.0 lets the app call the API (an access token with the API's `play` scope). Clients use the authorization code flow with PKCE (MSAL), and the API validates JWT bearer tokens.
 - **Entra External ID** is Microsoft's sign-in service for customer apps, with Google as its only sign-in option. It issues the players' access tokens.
+- **Only Google sign-ins reach the game.** The API accepts a player's token only when the player signed in with Google, and answers `403` to any other, so no other sign-in method can create a player.
 - **Registering is signing in for the first time.** The player signs in with their Google account, External ID creates their account, and the API creates the player profile on the first call to `/v1/me`, with their name and picture from Google. External ID may show one page of its own on the way; we check whether it can go straight to Google when we build sign-in.
 - **Every player call needs a signed-in player.** There are no anonymous endpoints apart from health checks.
 - **Our own player id.** The API maps a token's issuer and subject to an internal `playerId`, so the rest of the system never sees provider ids.
@@ -419,8 +420,11 @@ Estimates from Azure's list prices for Central US. The capacity is worked out fr
 | Service Bus | Basic: cents, billed per operation | Basic: cents, billed per operation |
 | Cosmos DB | Serverless: about $2, mostly the worker checking the change feed | Free tier: $0 |
 | Application Insights, Storage, Key Vault | A few dollars at most | A few dollars at most |
-| Entra External ID | Free up to 50,000 monthly active users | Free up to 50,000 monthly active users |
+| Entra External ID | $0, inside the shared free allowance | Free up to 50,000 monthly active users across both tenants, then $0.03 each |
 | **Total** | **About $17** | **About $65** |
+
+- **An alert at 40,000 players** keeps us inside External ID's free allowance. It counts the documents in production's `logins` container. Monthly active users can't outnumber accounts, and each account becomes a player on its first call to `/v1/me`, so the alert fires first and leaves room for test's users and admins.
+- **When it fires, we turn off sign-up** in production's user flow. Registered players keep signing in, and new players can't register.
 
 ### Players at once
 
