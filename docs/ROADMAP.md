@@ -71,9 +71,9 @@ It lands in three PRs: first the infrastructure and the pipeline that deploys it
 - [x] The health endpoint answers on test, and telemetry from all three apps reaches Application Insights.
 - [x] **You:** Publish release `v0.1.0` and approve its deployment.
 - [x] The health endpoint answers on production.
-- [ ] **You:** Publish release `v0.1.1`, with the rollback workflow, and approve its deployment.
-- [ ] **You:** Run "Roll back production" from `v0.1.1` and approve it, then run it again.
-- [ ] The first run puts v0.1.0 back in production, and the second puts v0.1.1 back.
+- [x] **You:** Publish release `v0.1.1`, with the rollback workflow, and approve its deployment.
+- [x] **You:** Run "Roll back production" from `v0.1.1` and approve it, then run it again.
+- [x] The first run puts v0.1.0 back in production, and the second puts v0.1.1 back.
 
 ## Phase 2: Registration and profiles
 
@@ -81,19 +81,22 @@ Players sign in with Google, and the API registers them and returns their profil
 
 ### Sign-in
 
-- [ ] **You:** Create a Microsoft Entra External ID tenant for each environment.
-- [ ] **You:** Create a Google OAuth client for each environment in Google Cloud, and add Google to its tenant as the only sign-in option, with a sign-up and sign-in user flow.
-- [ ] **You:** In each tenant, register the API with the scope players' access tokens carry, and a client registration that uses the authorization code flow with PKCE. The exact settings will be written down for you.
+- [x] **You:** Create a Microsoft Entra External ID tenant for each environment.
+- [x] **You:** Create a Google OAuth client for each environment in Google Cloud, and add Google to its tenant as the only sign-in option, with a sign-up and sign-in user flow.
+- [x] A script, `infra/sign-in/external-id.ps1`, that registers the API in each tenant with the scope players' access tokens carry, and a client that uses the authorization code flow with PKCE, and links the client to the user flow. Its README records every step done by hand.
+- [x] **You:** Run that script once.
 - [ ] Tokens carry the player's name and picture from Google.
 - [ ] Check whether sign-in can go straight to Google, without a page of External ID's own, and record the outcome in ARCHITECTURE.md section 3.8.
 
 ### Infrastructure
 
 - [ ] The API's settings for each environment: its tenant's issuer and the API's audience, and the client origins CORS allows.
+- [ ] An alert when production reaches 40,000 players, inside External ID's free 50,000 monthly active users.
 
 ### Development
 
 - [ ] JWT bearer authentication for players' tokens. Every endpoint needs a signed-in player, apart from health checks.
+- [ ] Only Google sign-ins: `403` for a player's token from any other sign-in method.
 - [ ] A development token issuer, accepted only locally and in tests.
 - [ ] Player ids: the `logins` container maps a token's issuer and subject to a `playerId`.
 - [ ] `GET /v1/me`: registers the player on their first call, with their name and picture, and returns their profile and stats.
@@ -103,7 +106,7 @@ Players sign in with Google, and the API registers them and returns their profil
 
 - [ ] Code coverage: CI shows line and branch coverage on each run's summary page.
 - [ ] The Cosmos DB emulator runs in CI.
-- [ ] `/v1/me`: `401` without a valid token, registration on the first call, the same player on every call after it, and a different player for a different issuer or subject.
+- [ ] `/v1/me`: `401` without a valid token, `403` for a sign-in other than Google, registration on the first call, the same player on every call after it, and a different player for a different issuer or subject.
 
 ### Release
 
