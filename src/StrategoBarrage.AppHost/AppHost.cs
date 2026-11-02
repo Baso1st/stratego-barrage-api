@@ -11,22 +11,37 @@ var database = cosmos.AddCosmosDatabase("stratego");
 var games = database.AddContainer("games", "/gameId");
 database.AddContainer("players", "/playerId");
 database.AddContainer("logins", "/id");
-database.AddContainer("leases", "/id");
+var leases = database.AddContainer("leases", "/id");
 
 var serviceBus = builder.AddAzureServiceBus("servicebus")
     .RunAsEmulator();
-serviceBus.AddServiceBusQueue("bot-turns");
-serviceBus.AddServiceBusQueue("game-timers");
+var botTurns = serviceBus.AddServiceBusQueue("bot-turns");
+var gameTimers = serviceBus.AddServiceBusQueue("game-timers");
 
 // The key that signs and checks development access tokens, made up on each run.
 var developmentTokenKey = Convert.ToBase64String(RandomNumberGenerator.GetBytes(32));
 
-builder.AddProject<Projects.StrategoBarrage_Api>("api")
+var api = builder.AddProject<Projects.StrategoBarrage_Api>("api")
     .WithReference(cosmos)
     .WaitFor(games)
     .WithEnvironment("DevelopmentTokens__SigningKey", developmentTokenKey)
     .WithHttpHealthCheck("/health");
-builder.AddAzureFunctionsProject<Projects.StrategoBarrage_Worker>("worker");
+
+// A shorter turn limit, such as "00:00:15", for watching turns run out locally and in tests.
+if (builder.Configuration["Games:TurnLimit"] is { Length: > 0 } turnLimit)
+{
+    api.WithEnvironment("Games__TurnLimit", turnLimit);
+}
+
+builder.AddAzureFunctionsProject<Projects.StrategoBarrage_Worker>("worker")
+    .WithReference(cosmos)
+    .WithReference(serviceBus)
+    .WithReference(api)
+    .WaitFor(games)
+    .WaitFor(leases)
+    .WaitFor(botTurns)
+    .WaitFor(gameTimers)
+    .WithEnvironment("DevelopmentTokens__SigningKey", developmentTokenKey);
 builder.AddAzureFunctionsProject<Projects.StrategoBarrage_Bot>("bot");
 
 builder.Build().Run();
