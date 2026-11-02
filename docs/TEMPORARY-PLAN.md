@@ -21,16 +21,16 @@ These keep the slice small. Each is replaced by its roadmap item later.
 
 ### Games and storage
 
-- [ ] The game document, its events and the version in the `games` container, with a `schemaVersion` on each, and stand-in rules behind the seam the engine plugs into.
-- [ ] Storage: one point read and one transactional batch per command. The state is replaced if its ETag still matches, and each event is created. A lost race is `409`.
-- [ ] Commands: start a game against the computer, move, resign, and time out.
+- [x] The game document, its events and the version in the `games` container, with a `schemaVersion` on each, and stand-in rules behind the seam the engine plugs into.
+- [x] Storage: one point read and one transactional batch per command. The state is replaced if its ETag still matches, and each event is created. A lost race is `409`.
+- [x] Commands: start a game against the computer, move, resign, and time out.
 
 ### The API
 
-- [ ] The development token issuer, and JWT bearer authentication on every endpoint apart from health checks.
-- [ ] `POST /v1/games` (`vs-bot`), `GET /v1/games/{id}`, `POST /v1/games/{id}/moves` and `POST /v1/games/{id}/resign`. Every view carries the version, the turn deadline and `serverTime`.
-- [ ] `409` with the current view when `expectedVersion` is stale, `422` for a move the rules don't allow, and `403` for a game you're not in.
-- [ ] `POST /internal/games/{id}/turn-expired`, only for the `Worker` role: the player to move loses, if the game is still at that version.
+- [x] The development token issuer, and JWT bearer authentication on every endpoint apart from health checks.
+- [x] `POST /v1/games` (`vs-bot`), `GET /v1/games/{id}`, `POST /v1/games/{id}/moves` and `POST /v1/games/{id}/resign`. Every view carries the version, the turn deadline and `serverTime`.
+- [x] `409` with the current view when `expectedVersion` is stale, `422` for a move the rules don't allow, and `403` for a game you're not in.
+- [x] `POST /internal/games/{id}/turn-expired`, only for the `Worker` role: the player to move loses, if the game is still at that version.
 
 ### The worker
 
@@ -46,6 +46,6 @@ These keep the slice small. Each is replaced by its roadmap item later.
 
 ### Tests and CI
 
-- [ ] Unit tests: the stand-in rules, and each command's events.
+- [x] Unit tests: the stand-in rules, and each command's events.
 - [ ] Integration tests through the app host, against the emulators: a game against the bot, a stale `expectedVersion`, a move racing its turn running out, a retried timer and bot turn, and stats counted once when a turn runs out. The turn limit is shortened in tests.
 - [ ] The emulators run in CI.

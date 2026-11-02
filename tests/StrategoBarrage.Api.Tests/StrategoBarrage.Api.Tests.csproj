@@ -21,6 +21,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\StrategoBarrage.AppHost\StrategoBarrage.AppHost.csproj" />
+    <ProjectReference Include="..\..\src\StrategoBarrage.Games\StrategoBarrage.Games.csproj" />
   </ItemGroup>
 
 </Project>

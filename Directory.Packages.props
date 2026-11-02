@@ -16,9 +16,11 @@
     <PackageVersion Include="Aspire.Hosting.Azure.Functions" Version="13.6.1" />
     <PackageVersion Include="Aspire.Hosting.Azure.ServiceBus" Version="13.6.1" />
     <PackageVersion Include="Aspire.Hosting.Testing" Version="13.6.1" />
+    <PackageVersion Include="Aspire.Microsoft.Azure.Cosmos" Version="13.6.1" />
   </ItemGroup>
 
   <ItemGroup Label="ASP.NET Core">
+    <PackageVersion Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.0.13" />
     <PackageVersion Include="Microsoft.AspNetCore.OpenApi" Version="10.0.13" />
     <PackageVersion Include="Microsoft.Extensions.ApiDescription.Server" Version="10.0.13" />
     <PackageVersion Include="Microsoft.Extensions.Diagnostics.HealthChecks" Version="10.0.13" />
@@ -28,6 +30,12 @@
     <PackageVersion Include="Microsoft.Azure.Functions.Worker" Version="2.52.0" />
     <PackageVersion Include="Microsoft.Azure.Functions.Worker.OpenTelemetry" Version="1.2.0" />
     <PackageVersion Include="Microsoft.Azure.Functions.Worker.Sdk" Version="2.1.0" />
+  </ItemGroup>
+
+  <ItemGroup Label="Cosmos DB">
+    <PackageVersion Include="Microsoft.Azure.Cosmos" Version="3.63.2" />
+    <!-- The Cosmos DB SDK still uses Newtonsoft.Json inside, and requires it to be referenced directly. -->
+    <PackageVersion Include="Newtonsoft.Json" Version="13.0.4" />
   </ItemGroup>
 
   <ItemGroup Label="Telemetry">
