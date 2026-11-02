@@ -34,11 +34,11 @@ These keep the slice small. Each is replaced by its roadmap item later.
 
 ### The worker
 
-- [ ] The change feed trigger on `games`, checking every 500 ms, with its position in `leases`.
-- [ ] On the bot's turn, it queues a `bot-turn`.
-- [ ] For each turn, it schedules a `turn-expired` message on `game-timers` for the turn's deadline.
-- [ ] When a game ends, it updates both players' stats and finished games in one batch per player, keyed by game, so a retry never counts a game twice.
-- [ ] The `game-timers` trigger, passing each due timer to `/internal/games/{id}/turn-expired`. A timer for a version that has passed changes nothing.
+- [x] The change feed trigger on `games`, checking every 500 ms, with its position in `leases`.
+- [x] On the bot's turn, it queues a `bot-turn`.
+- [x] For each turn, it schedules a `turn-expired` message on `game-timers` for the turn's deadline.
+- [x] When a game ends, it updates both players' stats and finished games in one batch per player, keyed by game, so a retry never counts a game twice.
+- [x] The `game-timers` trigger, passing each due timer to `/internal/games/{id}/turn-expired`. A timer for a version that has passed changes nothing.
 
 ### The bot
 

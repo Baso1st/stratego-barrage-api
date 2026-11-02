@@ -8,7 +8,7 @@ using OpenTelemetry.Trace;
 
 namespace Microsoft.Extensions.Hosting;
 
-// What the API, the worker and the bot all start with: telemetry and health checks.
+// What the API, the worker and the bot all start with: telemetry, health checks, and resilient HTTP calls.
 // Each app adds the instrumentation for how it's hosted (ASP.NET Core, or the Functions worker).
 public static class ServiceDefaultsExtensions
 {
@@ -18,6 +18,10 @@ public static class ServiceDefaultsExtensions
         builder.AddTelemetry();
         builder.Services.AddHealthChecks()
             .AddCheck("self", () => HealthCheckResult.Healthy());
+
+        // Every HTTP call retries a few times with backoff, with a timeout on each attempt and a circuit breaker.
+        // The calls between the apps are all safe to repeat: each is keyed by game and version.
+        builder.Services.ConfigureHttpClientDefaults(http => http.AddStandardResilienceHandler());
 
         return builder;
     }
