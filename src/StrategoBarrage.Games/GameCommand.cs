@@ -5,7 +5,8 @@ public abstract record GameCommand;
 // A game against the computer: the player is Red, and the bot is Blue.
 public sealed record StartGame(string GameId, string PlayerId) : GameCommand;
 
-public sealed record MakeMove(string PlayerId, Move Move) : GameCommand;
+// ExpectedVersion is the version the player saw when choosing the move.
+public sealed record MakeMove(string PlayerId, Move Move, int ExpectedVersion) : GameCommand;
 
 public sealed record Resign(string PlayerId) : GameCommand;
 
@@ -24,6 +25,7 @@ public enum RejectionReason
 {
     GameExists,
     NotAPlayer,
+    StaleVersion,
     GameOver,
     NotYourTurn,
     TurnTimedOut,

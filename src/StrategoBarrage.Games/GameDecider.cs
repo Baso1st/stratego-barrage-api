@@ -96,7 +96,7 @@ public sealed class GameDecider(IGameRules rules, GameOptions options, TimeProvi
 
     private Decision Move(Game game, MakeMove command, DateTimeOffset now)
     {
-        if (CheckPlayer(game, command.PlayerId, out var side) is { } refused)
+        if (CheckPlayer(game, command.PlayerId, command.ExpectedVersion, out var side) is { } refused)
         {
             return refused;
         }
@@ -133,7 +133,7 @@ public sealed class GameDecider(IGameRules rules, GameOptions options, TimeProvi
 
     private static Decision Resign(Game game, Resign command, DateTimeOffset now)
     {
-        if (CheckPlayer(game, command.PlayerId, out var side) is { } refused)
+        if (CheckPlayer(game, command.PlayerId, expectedVersion: null, out var side) is { } refused)
         {
             return refused;
         }
@@ -153,8 +153,9 @@ public sealed class GameDecider(IGameRules rules, GameOptions options, TimeProvi
         return new Accepted([Ended(game, game.Version + 1, by: null, result, now)]);
     }
 
-    // Someone not in the game is refused first, so they learn nothing about it.
-    private static Rejected? CheckPlayer(Game game, string playerId, out Side side)
+    // Someone not in the game is refused first, so they learn nothing about it. A command based on an
+    // older version is refused next, since the player chose it without seeing what happened since.
+    private static Rejected? CheckPlayer(Game game, string playerId, int? expectedVersion, out Side side)
     {
         if (game.SideOf(playerId) is not { } found)
         {
@@ -163,6 +164,13 @@ public sealed class GameDecider(IGameRules rules, GameOptions options, TimeProvi
         }
 
         side = found;
+        if (expectedVersion is { } expected && expected != game.Version)
+        {
+            return new Rejected(
+                RejectionReason.StaleVersion,
+                $"The game is at version {game.Version}, not {expected}.");
+        }
+
         return game.Status == GameStatus.Playing
             ? null
             : new Rejected(RejectionReason.GameOver, "The game is over.");

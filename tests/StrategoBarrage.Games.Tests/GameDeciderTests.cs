@@ -50,7 +50,7 @@ public class GameDeciderTests
         var game = Start();
         _clock.Now += TimeSpan.FromMinutes(3);
 
-        var events = Accept(game, new MakeMove(PlayerId, RedOpening));
+        var events = Accept(game, new MakeMove(PlayerId, RedOpening, 1));
         var next = _decider.Apply(game, events);
 
         var made = events.ShouldHaveSingleItem().ShouldBeOfType<MoveMade>();
@@ -66,9 +66,9 @@ public class GameDeciderTests
     [Fact]
     public void TheBotMovesAsBlue()
     {
-        var game = Play(Start(), new MakeMove(PlayerId, RedOpening));
+        var game = Play(Start(), new MakeMove(PlayerId, RedOpening, 1));
 
-        var next = Play(game, new MakeMove(GamePlayer.Bot.PlayerId, BlueOpening));
+        var next = Play(game, new MakeMove(GamePlayer.Bot.PlayerId, BlueOpening, 2));
 
         next.Version.ShouldBe(3);
         next.State.ToMove.ShouldBe(Side.Red);
@@ -77,7 +77,19 @@ public class GameDeciderTests
     [Fact]
     public void AMoveOutOfTurnIsRefused()
     {
-        Reject(Start(), new MakeMove(GamePlayer.Bot.PlayerId, BlueOpening)).ShouldBe(RejectionReason.NotYourTurn);
+        Reject(Start(), new MakeMove(GamePlayer.Bot.PlayerId, BlueOpening, 1)).ShouldBe(RejectionReason.NotYourTurn);
+    }
+
+    [Fact]
+    public void AMoveBasedOnAnOlderVersionIsRefused()
+    {
+        var game = Play(Start(), new MakeMove(PlayerId, RedOpening, 1));
+        game = Play(game, new MakeMove(GamePlayer.Bot.PlayerId, BlueOpening, 2));
+        var next = new Move(new Square(5, 1), new Square(5, 0));
+
+        // The player saw version 2, but the bot has moved since.
+        Reject(game, new MakeMove(PlayerId, next, 2)).ShouldBe(RejectionReason.StaleVersion);
+        Accept(game, new MakeMove(PlayerId, next, 3)).ShouldHaveSingleItem().ShouldBeOfType<MoveMade>();
     }
 
     [Fact]
@@ -85,7 +97,7 @@ public class GameDeciderTests
     {
         var sideways = new Move(new Square(6, 1), new Square(6, 2));
 
-        Reject(Start(), new MakeMove(PlayerId, sideways)).ShouldBe(RejectionReason.IllegalMove);
+        Reject(Start(), new MakeMove(PlayerId, sideways, 1)).ShouldBe(RejectionReason.IllegalMove);
     }
 
     [Fact]
@@ -94,7 +106,7 @@ public class GameDeciderTests
         var game = Start();
         _clock.Now += TurnLimit;
 
-        Reject(game, new MakeMove(PlayerId, RedOpening)).ShouldBe(RejectionReason.TurnTimedOut);
+        Reject(game, new MakeMove(PlayerId, RedOpening, 1)).ShouldBe(RejectionReason.TurnTimedOut);
     }
 
     [Fact]
@@ -103,7 +115,7 @@ public class GameDeciderTests
         var game = Play(Start(), new Resign(PlayerId));
 
         // Even once the game is over, so they learn nothing about it.
-        Reject(game, new MakeMove("someone-else", RedOpening)).ShouldBe(RejectionReason.NotAPlayer);
+        Reject(game, new MakeMove("someone-else", RedOpening, 2)).ShouldBe(RejectionReason.NotAPlayer);
         Reject(game, new Resign("someone-else")).ShouldBe(RejectionReason.NotAPlayer);
     }
 
@@ -139,7 +151,7 @@ public class GameDeciderTests
     {
         var game = Play(Start(), new Resign(PlayerId));
 
-        Reject(game, new MakeMove(PlayerId, RedOpening)).ShouldBe(RejectionReason.GameOver);
+        Reject(game, new MakeMove(PlayerId, RedOpening, 2)).ShouldBe(RejectionReason.GameOver);
         Reject(game, new Resign(GamePlayer.Bot.PlayerId)).ShouldBe(RejectionReason.GameOver);
         Reject(game, new TimeOut(game.Version)).ShouldBe(RejectionReason.TimerPassed);
     }
@@ -147,7 +159,7 @@ public class GameDeciderTests
     [Fact]
     public void RunningOutOfTimeEndsTheGameAndTheOpponentWins()
     {
-        var game = Play(Start(), new MakeMove(PlayerId, RedOpening));
+        var game = Play(Start(), new MakeMove(PlayerId, RedOpening, 1));
         _clock.Now += TurnLimit;
 
         var events = Accept(game, new TimeOut(game.Version));
@@ -165,7 +177,7 @@ public class GameDeciderTests
     {
         var game = Start();
         var timerVersion = game.Version;
-        game = Play(game, new MakeMove(PlayerId, RedOpening));
+        game = Play(game, new MakeMove(PlayerId, RedOpening, 1));
 
         Reject(game, new TimeOut(timerVersion)).ShouldBe(RejectionReason.TimerPassed);
     }
@@ -174,7 +186,7 @@ public class GameDeciderTests
     public void EventsMustFollowTheGamesVersion()
     {
         var game = Start();
-        var events = Accept(game, new MakeMove(PlayerId, RedOpening));
+        var events = Accept(game, new MakeMove(PlayerId, RedOpening, 1));
 
         Should.Throw<InvalidOperationException>(() => _decider.Apply(_decider.Apply(game, events), events));
     }

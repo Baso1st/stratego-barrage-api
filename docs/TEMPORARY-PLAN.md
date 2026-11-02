@@ -22,7 +22,7 @@ These keep the slice small. Each is replaced by its roadmap item later.
 ### Games and storage
 
 - [x] The game document, its events and the version in the `games` container, with a `schemaVersion` on each, and stand-in rules behind the seam the engine plugs into.
-- [ ] Storage: one point read and one transactional batch per command. The state is replaced if its ETag still matches, and each event is created. A lost race is `409`.
+- [x] Storage: one point read and one transactional batch per command. The state is replaced if its ETag still matches, and each event is created. A lost race is `409`.
 - [x] Commands: start a game against the computer, move, resign, and time out.
 
 ### The API

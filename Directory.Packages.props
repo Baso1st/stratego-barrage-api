@@ -30,6 +30,12 @@
     <PackageVersion Include="Microsoft.Azure.Functions.Worker.Sdk" Version="2.1.0" />
   </ItemGroup>
 
+  <ItemGroup Label="Cosmos DB">
+    <PackageVersion Include="Microsoft.Azure.Cosmos" Version="3.63.2" />
+    <!-- The Cosmos DB SDK still uses Newtonsoft.Json inside, and requires it to be referenced directly. -->
+    <PackageVersion Include="Newtonsoft.Json" Version="13.0.4" />
+  </ItemGroup>
+
   <ItemGroup Label="Telemetry">
     <PackageVersion Include="Azure.Identity" Version="1.21.0" />
     <PackageVersion Include="Azure.Monitor.OpenTelemetry.Exporter" Version="1.10.0" />
