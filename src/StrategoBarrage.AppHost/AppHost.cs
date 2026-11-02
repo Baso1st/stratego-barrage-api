@@ -42,6 +42,10 @@ builder.AddAzureFunctionsProject<Projects.StrategoBarrage_Worker>("worker")
     .WaitFor(botTurns)
     .WaitFor(gameTimers)
     .WithEnvironment("DevelopmentTokens__SigningKey", developmentTokenKey);
-builder.AddAzureFunctionsProject<Projects.StrategoBarrage_Bot>("bot");
+builder.AddAzureFunctionsProject<Projects.StrategoBarrage_Bot>("bot")
+    .WithReference(serviceBus)
+    .WithReference(api)
+    .WaitFor(botTurns)
+    .WithEnvironment("DevelopmentTokens__SigningKey", developmentTokenKey);
 
 builder.Build().Run();

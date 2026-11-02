@@ -21,7 +21,8 @@ public sealed class GameTimers(ApiClient api)
                 await api.TurnExpiredAsync(timer, cancellationToken);
                 break;
             default:
-                throw new InvalidOperationException($"Timer {message.MessageId} has an unknown subject: {message.Subject}");
+                throw new InvalidOperationException(
+                    $"Timer {message.MessageId} has an unknown subject: {message.Subject}");
         }
     }
 }

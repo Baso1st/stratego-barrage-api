@@ -42,10 +42,10 @@ These keep the slice small. Each is replaced by its roadmap item later.
 
 ### The bot
 
-- [ ] The `bot-turns` trigger: it fetches its own view, makes the first legal move, and submits it. A message for a version that has passed changes nothing.
+- [x] The `bot-turns` trigger: it fetches its own view, makes the first legal move, and submits it. A message for a version that has passed changes nothing.
 
 ### Tests and CI
 
 - [x] Unit tests: the stand-in rules, and each command's events.
 - [ ] Integration tests through the app host, against the emulators: a game against the bot, a stale `expectedVersion`, a move racing its turn running out, a retried timer and bot turn, and stats counted once when a turn runs out. The turn limit is shortened in tests.
-- [ ] The emulators run in CI.
+- [x] The emulators run in CI.

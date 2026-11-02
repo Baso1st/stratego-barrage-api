@@ -2,6 +2,7 @@ using System.Buffers.Text;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
+using Microsoft.Extensions.Configuration;
 
 namespace StrategoBarrage.ServiceDefaults;
 
@@ -15,6 +16,8 @@ public static class DevelopmentTokens
 
     // The setting that holds the base64 signing key, in every app that signs or checks these tokens.
     public const string SigningKeySetting = "DevelopmentTokens:SigningKey";
+
+    private static readonly TimeSpan AppTokenLifetime = TimeSpan.FromMinutes(5);
 
     public static string Create(byte[] signingKey, string subject, string? role, DateTimeOffset now, TimeSpan lifetime)
     {
@@ -32,9 +35,19 @@ public static class DevelopmentTokens
             claims["roles"] = new[] { role };
         }
 
-        var unsigned = $"{Encode(new Dictionary<string, string> { ["alg"] = "HS256", ["typ"] = "JWT" })}.{Encode(claims)}";
+        var header = new Dictionary<string, string> { ["alg"] = "HS256", ["typ"] = "JWT" };
+        var unsigned = $"{Encode(header)}.{Encode(claims)}";
         var signature = HMACSHA256.HashData(signingKey, Encoding.ASCII.GetBytes(unsigned));
         return $"{unsigned}.{Base64Url.EncodeToString(signature)}";
+    }
+
+    // A short-lived token for the worker or the bot, signed with the key in configuration. For now they sign in to
+    // the API this way, so they only call an API running locally.
+    public static string CreateForApp(IConfiguration configuration, string subject, string role, DateTimeOffset now)
+    {
+        var key = configuration[SigningKeySetting]
+            ?? throw new InvalidOperationException($"There's no {SigningKeySetting} to sign in to the API with.");
+        return Create(Convert.FromBase64String(key), subject, role, now, AppTokenLifetime);
     }
 
     private static string Encode<T>(T value) => Base64Url.EncodeToString(JsonSerializer.SerializeToUtf8Bytes(value));

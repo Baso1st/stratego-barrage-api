@@ -7,11 +7,13 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.Azure.Functions.Worker" />
+    <PackageReference Include="Microsoft.Azure.Functions.Worker.Extensions.ServiceBus" />
     <PackageReference Include="Microsoft.Azure.Functions.Worker.OpenTelemetry" />
     <PackageReference Include="Microsoft.Azure.Functions.Worker.Sdk" />
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\StrategoBarrage.Games\StrategoBarrage.Games.csproj" />
     <ProjectReference Include="..\StrategoBarrage.ServiceDefaults\StrategoBarrage.ServiceDefaults.csproj" />
   </ItemGroup>
 
