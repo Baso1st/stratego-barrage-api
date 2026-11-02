@@ -20,14 +20,20 @@ public sealed class PlayerStore(Container container, TimeProvider time)
             var (profile, etag) = await FindAsync(game.PlayerId, cancellationToken);
 
             // For now a player's profile is created when their first game ends.
-            profile ??= new PlayerProfile { PlayerId = game.PlayerId, Stats = PlayerStats.None, CreatedAt = time.GetUtcNow() };
+            profile ??= new PlayerProfile
+            {
+                PlayerId = game.PlayerId,
+                Stats = PlayerStats.None,
+                CreatedAt = time.GetUtcNow(),
+            };
             var updated = profile with { Stats = profile.Stats.Add(game) };
 
             var batch = container.CreateTransactionalBatch(new PartitionKey(game.PlayerId))
                 .CreateItem(game);
             batch = etag is null
                 ? batch.CreateItem(updated)
-                : batch.ReplaceItem(updated.Id, updated, new TransactionalBatchItemRequestOptions { IfMatchEtag = etag });
+                : batch.ReplaceItem(
+                    updated.Id, updated, new TransactionalBatchItemRequestOptions { IfMatchEtag = etag });
 
             using var response = await batch.ExecuteAsync(cancellationToken);
             if (response.IsSuccessStatusCode)

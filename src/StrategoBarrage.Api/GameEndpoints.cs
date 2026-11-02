@@ -37,7 +37,11 @@ public static class GameEndpoints
     }
 
     private static async Task<Results<Created<PlayerView>, ProblemHttpResult>> StartAsync(
-        StartGameRequest request, ClaimsPrincipal user, GameService games, Views views, CancellationToken cancellationToken)
+        StartGameRequest request,
+        ClaimsPrincipal user,
+        GameService games,
+        Views views,
+        CancellationToken cancellationToken)
     {
         if (user.IsInRole(Roles.Bot))
         {
