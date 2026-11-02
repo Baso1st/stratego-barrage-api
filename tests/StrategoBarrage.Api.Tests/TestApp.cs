@@ -2,12 +2,12 @@ using Aspire.Hosting.Azure;
 using Microsoft.Azure.Cosmos;
 using StrategoBarrage.Games;
 
-[assembly: AssemblyFixture(typeof(StrategoBarrage.Api.Tests.CosmosEmulator))]
+[assembly: AssemblyFixture(typeof(StrategoBarrage.Api.Tests.TestApp))]
 
 namespace StrategoBarrage.Api.Tests;
 
-// The Cosmos DB emulator, with the app host's database and containers, started once for all the tests.
-public sealed class CosmosEmulator : IAsyncLifetime
+// The app host's API and Cosmos DB emulator, with its database and containers, started once for all the tests.
+public sealed class TestApp : IAsyncLifetime
 {
     private static readonly TimeSpan StartTimeout = TimeSpan.FromMinutes(5);
 
@@ -16,20 +16,23 @@ public sealed class CosmosEmulator : IAsyncLifetime
 
     public Container Games => _client!.GetContainer("stratego", "games");
 
+    public HttpClient CreateApiClient() => _app!.CreateHttpClient("api");
+
     public async ValueTask InitializeAsync()
     {
         var cancellationToken = TestContext.Current.CancellationToken;
         var builder = await DistributedApplicationTestingBuilder
             .CreateAsync<Projects.StrategoBarrage_AppHost>(cancellationToken);
 
-        // Only Cosmos DB is needed, so the apps and Service Bus aren't started. Aspire's Azure environment
-        // stays, since the Azure resources depend on it. Aspire marks its type as experimental.
+        // Service Bus and the Function Apps aren't started. Aspire's Azure environment stays, since the Azure
+        // resources depend on it. Aspire marks its type as experimental.
 #pragma warning disable ASPIREAZURE001
         var others = builder.Resources
             .Where(resource => resource is not (AzureEnvironmentResource
                 or AzureCosmosDBResource
                 or AzureCosmosDBDatabaseResource
-                or AzureCosmosDBContainerResource))
+                or AzureCosmosDBContainerResource)
+                && resource.Name != "api")
             .ToList();
 #pragma warning restore ASPIREAZURE001
         foreach (var resource in others)
@@ -39,7 +42,7 @@ public sealed class CosmosEmulator : IAsyncLifetime
 
         _app = await builder.BuildAsync(cancellationToken);
         await _app.StartAsync(cancellationToken).WaitAsync(StartTimeout, cancellationToken);
-        await _app.ResourceNotifications.WaitForResourceHealthyAsync("games", cancellationToken)
+        await _app.ResourceNotifications.WaitForResourceHealthyAsync("api", cancellationToken)
             .WaitAsync(StartTimeout, cancellationToken);
 
         var connectionString = await _app.GetConnectionStringAsync("cosmos", cancellationToken);

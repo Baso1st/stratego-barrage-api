@@ -4,12 +4,12 @@ namespace StrategoBarrage.Api.Tests;
 
 // Games saved to the Cosmos DB emulator: one point read and one transactional batch per command,
 // guarded by the ETag.
-public class GameStoreTests(CosmosEmulator cosmos)
+public class GameStoreTests(TestApp app)
 {
     private const string PlayerId = "0192f3a1-0000-7000-8000-000000000001";
     private static readonly Move RedOpening = new(new Square(6, 1), new Square(5, 1));
 
-    private readonly GameStore _store = new(cosmos.Games);
+    private readonly GameStore _store = new(app.Games);
     private readonly GameDecider _decider = new(new StandInRules(), new GameOptions(), TimeProvider.System);
 
     private GameService Service => new(_store, _decider);
