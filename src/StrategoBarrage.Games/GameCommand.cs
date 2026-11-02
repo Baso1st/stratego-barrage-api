@@ -1,3 +1,5 @@
+using System.Text.Json.Serialization;
+
 namespace StrategoBarrage.Games;
 
 public abstract record GameCommand;
@@ -21,14 +23,31 @@ public sealed record Accepted(IReadOnlyList<GameEvent> Events) : Decision;
 
 public sealed record Rejected(RejectionReason Reason, string Detail) : Decision;
 
+// Sent to clients as the "reason" of a refused command.
+[JsonConverter(typeof(JsonStringEnumConverter<RejectionReason>))]
 public enum RejectionReason
 {
+    [JsonStringEnumMemberName("game-exists")]
     GameExists,
+
+    [JsonStringEnumMemberName("not-a-player")]
     NotAPlayer,
+
+    [JsonStringEnumMemberName("stale-version")]
     StaleVersion,
+
+    [JsonStringEnumMemberName("game-over")]
     GameOver,
+
+    [JsonStringEnumMemberName("not-your-turn")]
     NotYourTurn,
+
+    [JsonStringEnumMemberName("turn-timed-out")]
     TurnTimedOut,
+
+    [JsonStringEnumMemberName("illegal-move")]
     IllegalMove,
+
+    [JsonStringEnumMemberName("timer-passed")]
     TimerPassed,
 }

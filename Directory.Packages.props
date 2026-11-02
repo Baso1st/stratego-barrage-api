@@ -16,9 +16,11 @@
     <PackageVersion Include="Aspire.Hosting.Azure.Functions" Version="13.6.1" />
     <PackageVersion Include="Aspire.Hosting.Azure.ServiceBus" Version="13.6.1" />
     <PackageVersion Include="Aspire.Hosting.Testing" Version="13.6.1" />
+    <PackageVersion Include="Aspire.Microsoft.Azure.Cosmos" Version="13.6.1" />
   </ItemGroup>
 
   <ItemGroup Label="ASP.NET Core">
+    <PackageVersion Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.0.13" />
     <PackageVersion Include="Microsoft.AspNetCore.OpenApi" Version="10.0.13" />
     <PackageVersion Include="Microsoft.Extensions.ApiDescription.Server" Version="10.0.13" />
     <PackageVersion Include="Microsoft.Extensions.Diagnostics.HealthChecks" Version="10.0.13" />

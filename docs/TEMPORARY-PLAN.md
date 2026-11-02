@@ -27,10 +27,10 @@ These keep the slice small. Each is replaced by its roadmap item later.
 
 ### The API
 
-- [ ] The development token issuer, and JWT bearer authentication on every endpoint apart from health checks.
-- [ ] `POST /v1/games` (`vs-bot`), `GET /v1/games/{id}`, `POST /v1/games/{id}/moves` and `POST /v1/games/{id}/resign`. Every view carries the version, the turn deadline and `serverTime`.
-- [ ] `409` with the current view when `expectedVersion` is stale, `422` for a move the rules don't allow, and `403` for a game you're not in.
-- [ ] `POST /internal/games/{id}/turn-expired`, only for the `Worker` role: the player to move loses, if the game is still at that version.
+- [x] The development token issuer, and JWT bearer authentication on every endpoint apart from health checks.
+- [x] `POST /v1/games` (`vs-bot`), `GET /v1/games/{id}`, `POST /v1/games/{id}/moves` and `POST /v1/games/{id}/resign`. Every view carries the version, the turn deadline and `serverTime`.
+- [x] `409` with the current view when `expectedVersion` is stale, `422` for a move the rules don't allow, and `403` for a game you're not in.
+- [x] `POST /internal/games/{id}/turn-expired`, only for the `Worker` role: the player to move loses, if the game is still at that version.
 
 ### The worker
 
