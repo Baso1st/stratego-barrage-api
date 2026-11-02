@@ -21,9 +21,9 @@ These keep the slice small. Each is replaced by its roadmap item later.
 
 ### Games and storage
 
-- [ ] The game document, its events and the version in the `games` container, with a `schemaVersion` on each, and stand-in rules behind the seam the engine plugs into.
+- [x] The game document, its events and the version in the `games` container, with a `schemaVersion` on each, and stand-in rules behind the seam the engine plugs into.
 - [ ] Storage: one point read and one transactional batch per command. The state is replaced if its ETag still matches, and each event is created. A lost race is `409`.
-- [ ] Commands: start a game against the computer, move, resign, and time out.
+- [x] Commands: start a game against the computer, move, resign, and time out.
 
 ### The API
 
@@ -46,6 +46,6 @@ These keep the slice small. Each is replaced by its roadmap item later.
 
 ### Tests and CI
 
-- [ ] Unit tests: the stand-in rules, and each command's events.
+- [x] Unit tests: the stand-in rules, and each command's events.
 - [ ] Integration tests through the app host, against the emulators: a game against the bot, a stale `expectedVersion`, a move racing its turn running out, a retried timer and bot turn, and stats counted once when a turn runs out. The turn limit is shortened in tests.
 - [ ] The emulators run in CI.
